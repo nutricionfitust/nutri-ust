@@ -3,201 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>NutriUst — Alimentación y Rendimiento Deportivo</title>
+<title>NutriUst — Nutrición Deportiva</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
   :root{
-    --blue:#0072FB;
-    --blue-2:#6EA4FB;
-    --blue-3:#99C5FF;
-    --ink-1:#0B1B33;
-    --ink-2:#3E4E75;
-    --ink-3:#8592B4;
-    --card:#FFFFFF;
-    --line:#DCE6F8;
-    --chip:#EAF2FF;
+    --blue:#0072FB; --blue-2:#6EA4FB; --blue-3:#99C5FF;
+    --ink-1:#0B1B33; --ink-2:#3E4E75; --ink-3:#8592B4;
+    --card:#FFFFFF; --line:#DCE6F8; --chip:#EAF2FF;
     --shadow:rgba(20,60,140,0.12);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{scroll-behavior:smooth; touch-action:manipulation;}
   html,body{margin:0;padding:0;height:100%;}
   body{
-    font-family:'Plus Jakarta Sans', sans-serif;
-    color:var(--ink-1);
-    min-height:100vh;
-    position:relative;
-    overflow-x:hidden;
+    font-family:'Plus Jakarta Sans', sans-serif; color:var(--ink-1);
+    min-height:100vh; position:relative; overflow-x:hidden;
   }
-
-  /* ---------- fixed diffused celeste/blue/white background ---------- */
-  #bg{
-    position:fixed; inset:0; z-index:-1;
-    background:#FBFDFF;
-  }
-  #bg::before, #bg::after{
-    content:'';
-    position:absolute;
-    border-radius:50%;
-    filter:blur(70px);
-  }
+  #bg{position:fixed; inset:0; z-index:-1; background:#FBFDFF;}
+  #bg::before, #bg::after{content:''; position:absolute; border-radius:50%; filter:blur(70px);}
   #bg::before{
-    width:70vw;height:70vw;max-width:900px;max-height:900px;
-    top:-25vw; left:-20vw;
+    width:70vw;height:70vw;max-width:900px;max-height:900px; top:-25vw; left:-20vw;
     background:radial-gradient(circle, rgba(0,114,251,0.40) 0%, rgba(0,114,251,0.16) 45%, transparent 72%);
   }
   #bg::after{
-    width:65vw;height:65vw;max-width:820px;max-height:820px;
-    bottom:-28vw; right:-18vw;
+    width:65vw;height:65vw;max-width:820px;max-height:820px; bottom:-28vw; right:-18vw;
     background:radial-gradient(circle, rgba(153,197,255,0.55) 0%, rgba(110,164,251,0.22) 48%, transparent 72%);
   }
   #bg .mid{
     position:absolute; top:30%; left:50%; transform:translate(-50%,-50%);
-    width:60vw;height:60vw;max-width:760px;max-height:760px;
-    border-radius:50%; filter:blur(85px);
+    width:60vw;height:60vw;max-width:760px;max-height:760px; border-radius:50%; filter:blur(85px);
     background:radial-gradient(circle, rgba(110,164,251,0.30) 0%, transparent 70%);
   }
 
-  /* ---------- top bar / index ---------- */
-  .topbar{
-    position:sticky; top:0; z-index:5;
-    background:rgba(251,253,255,0.82);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line);
+  /* ===== screen: folders ===== */
+  #screen-folders{max-width:428px; margin:0 auto; padding:28px 16px 40px;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .greet{font-size:22px;font-weight:700;letter-spacing:-0.01em;}
+  .greet span{color:var(--blue);}
+  .sub{color:var(--ink-3);font-size:13px;margin-top:4px;}
+  .avatar{
+    width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--blue),var(--blue-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;
+    box-shadow:0 8px 18px rgba(0,114,251,0.30); flex-shrink:0;
   }
-  .topbar-inner{
-    max-width:900px; margin:0 auto;
-    display:flex; align-items:center; gap:12px;
-    padding:14px 18px;
+  .folder{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    margin-bottom:10px; overflow:hidden; box-shadow:0 6px 20px var(--shadow);
+    transition:border-color .2s ease;
   }
-  .back-btn, .idx-btn{
-    width:36px;height:36px;border-radius:11px;
-    background:var(--chip); border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--blue); cursor:pointer; flex-shrink:0;
+  .folder.open{border-color:rgba(0,114,251,0.35);}
+  .folder-head{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;position:relative;}
+  .folder-head::before{
+    content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px;
+    background:var(--blue); border-radius:0 3px 3px 0; opacity:0; transition:opacity .2s ease;
   }
-  .topbar-crumb{
-    font-family:'DM Mono', monospace; font-size:11px;
-    color:var(--ink-3); text-transform:uppercase; letter-spacing:0.07em;
-    flex:1;
+  .folder.open .folder-head::before{opacity:1;}
+  .folder-icon{width:34px;height:34px;border-radius:10px;background:var(--chip);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .folder-icon svg{width:16px;height:16px;}
+  .folder-meta{flex:1;min-width:0;}
+  .folder-name{font-size:15px;font-weight:600;}
+  .folder-count{font-family:'DM Mono', monospace;font-size:11px;color:var(--ink-3);margin-top:2px;}
+  .chev{color:var(--ink-3);transition:transform .25s ease;flex-shrink:0;}
+  .folder.open .chev{transform:rotate(180deg);color:var(--blue);}
+  .resource-list{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .folder.open .resource-list{max-height:600px;}
+  .resource{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 62px;border-top:1px solid var(--line);cursor:pointer;}
+  .resource:hover{background:#F6FAFF;}
+  .resource-dot{width:6px;height:6px;border-radius:50%;background:var(--blue-2);flex-shrink:0;}
+  .resource.pending .resource-dot{background:var(--line);}
+  .resource-title{font-size:13.5px;font-weight:500;color:var(--ink-1);flex:1;}
+  .resource.pending .resource-title{color:var(--ink-3);}
+  .resource-tag{font-family:'DM Mono', monospace; font-size:9.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em;}
+  .resource-arrow{color:var(--ink-3);font-size:13px;}
+  .ig-footer{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line);}
+  .ig-footer a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink-2);font-size:13px;font-weight:600;}
+  .ig-icon{width:20px;height:20px;flex-shrink:0;}
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+    background:var(--ink-1); color:#fff; font-size:13px; padding:11px 18px; border-radius:12px;
+    box-shadow:0 14px 30px rgba(11,27,51,0.30); z-index:30; opacity:0; pointer-events:none; transition:opacity .25s ease;
   }
+  .toast.show{opacity:1;}
+
+  /* ===== screen: reader ===== */
+  #screen-reader{display:none; position:fixed; inset:0; background:#FBFDFF; overflow-y:auto; -webkit-overflow-scrolling:touch; z-index:10;}
+  #screen-reader.show{display:block;}
+  .reader-top{position:sticky;top:0;z-index:5;background:rgba(251,253,255,0.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  .reader-bar{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:14px 18px;}
+  .back-btn, .idx-btn{width:36px;height:36px;border-radius:11px;background:var(--chip);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--blue);cursor:pointer;flex-shrink:0;}
+  .reader-crumb{font-family:'DM Mono', monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.07em;flex:1;}
   .progress-track{height:3px;background:var(--line);}
   .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-2));transition:width .08s linear;}
-
-  /* ---------- reading column: mobile default, widens like a paper on desktop ---------- */
-  .doc{
-    max-width:640px;
-    margin:0 auto;
-    padding:28px 20px 100px;
-  }
+  .doc{max-width:640px;margin:0 auto;padding:28px 20px 100px;}
   @media (min-width:900px){
-    .doc{
-      max-width:760px;
-      padding:56px 40px 140px;
-      font-size:16px;
-    }
-    .doc .reader-h1{font-size:32px;}
-    .doc .block-h2{font-size:20px;}
-    .doc .block-h3{font-size:16.5px;}
-    .doc .block-p, .doc .block-ul li{font-size:15.5px; line-height:1.85;}
+    .doc{max-width:760px;padding:56px 40px 140px;font-size:16px;}
+    .doc .reader-h1{font-size:32px;} .doc .block-h2{font-size:20px;} .doc .block-h3{font-size:16.5px;}
+    .doc .block-p, .doc .block-ul li{font-size:15.5px;line-height:1.85;}
   }
-  @media (min-width:1300px){
-    .doc{max-width:800px;}
-  }
-
-  .eyebrow{
-    display:inline-flex; font-family:'DM Mono', monospace; font-size:11px;
-    color:var(--blue); letter-spacing:0.09em; text-transform:uppercase; margin-bottom:12px;
-  }
+  @media (min-width:1300px){.doc{max-width:800px;}}
+  .eyebrow{display:inline-flex;font-family:'DM Mono', monospace;font-size:11px;color:var(--blue);letter-spacing:0.09em;text-transform:uppercase;margin-bottom:12px;}
   .reader-h1{font-size:25px;font-weight:800;line-height:1.24;letter-spacing:-0.01em;margin:0 0 8px;}
   .reader-sub{font-size:13.5px;color:var(--ink-3);margin-bottom:8px;}
   .reader-byline{font-size:12.5px;color:var(--ink-3);margin-bottom:30px;display:flex;align-items:center;gap:8px;}
   .reader-byline a{color:var(--blue);text-decoration:none;font-weight:600;}
-
-  /* index card */
-  .idx-card{
-    background:var(--card); border:1px solid var(--line); border-radius:18px;
-    padding:8px 6px; margin-bottom:34px;
-    box-shadow:0 10px 30px var(--shadow);
-  }
-  .idx-card-title{
-    font-family:'DM Mono', monospace; font-size:10.5px; letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--ink-3); padding:10px 16px 4px;
-  }
-  .idx-item{
-    display:flex; align-items:center; gap:10px;
-    padding:9px 16px; border-radius:10px; cursor:pointer;
-    text-decoration:none; color:var(--ink-1); font-size:13.5px; font-weight:500;
-  }
+  .idx-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:8px 6px;margin-bottom:34px;box-shadow:0 10px 30px var(--shadow);}
+  .idx-card-title{font-family:'DM Mono', monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);padding:10px 16px 4px;}
+  .idx-item{display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:10px;cursor:pointer;text-decoration:none;color:var(--ink-1);font-size:13.5px;font-weight:500;}
   .idx-item:hover{background:var(--chip);}
-  .idx-num{
-    font-family:'DM Mono', monospace; font-size:11px; color:var(--blue);
-    width:20px; flex-shrink:0;
-  }
-
-  section.sec{scroll-margin-top:90px; margin-bottom:8px;}
-  .block-h2{
-    font-size:18px;font-weight:700;color:var(--blue);
-    margin:36px 0 12px; padding-left:13px; border-left:3px solid var(--blue);
-  }
-  .block-h3{
-    font-size:14.5px;font-weight:700;color:var(--ink-1);margin:20px 0 8px;
-    display:flex; align-items:center; gap:7px;
-  }
+  .idx-num{font-family:'DM Mono', monospace;font-size:11px;color:var(--blue);width:20px;flex-shrink:0;}
+  section.sec{scroll-margin-top:90px;margin-bottom:8px;}
+  .block-h2{font-size:18px;font-weight:700;color:var(--blue);margin:36px 0 12px;padding-left:13px;border-left:3px solid var(--blue);}
+  .block-h3{font-size:14.5px;font-weight:700;color:var(--ink-1);margin:20px 0 8px;display:flex;align-items:center;gap:7px;}
   .block-p{font-size:14.5px;line-height:1.75;color:var(--ink-2);margin:0 0 13px;}
   .block-ul{margin:0 0 15px;padding-left:0;list-style:none;}
-  .block-ul li{
-    font-size:14px;line-height:1.65;color:var(--ink-2);
-    padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line);
-  }
+  .block-ul li{font-size:14px;line-height:1.65;color:var(--ink-2);padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line);}
   .block-ul li:last-child{border-bottom:none;}
   .block-ul li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--blue-2);}
   .block-ol{margin:0 0 15px;padding-left:22px;color:var(--ink-2);font-size:14px;line-height:1.7;}
   .block-ol li{margin-bottom:8px;}
-  .callout{
-    background:var(--chip); border-radius:14px; padding:16px 18px;
-    font-size:13.5px; color:var(--ink-1); font-weight:500; line-height:1.65; margin:18px 0;
-  }
-  .callout.strong{background:linear-gradient(135deg, rgba(0,114,251,0.10), rgba(153,197,255,0.18)); border:1px solid rgba(0,114,251,0.20);}
-  .xlink{
-    display:inline-flex;align-items:center;gap:5px;
-    background:var(--chip);color:var(--blue);font-size:13px;font-weight:600;
-    padding:3px 10px;border-radius:8px;border:1px solid rgba(0,114,251,0.25);
-    text-decoration:none; margin:2px 0;
-  }
+  .callout{background:var(--chip);border-radius:14px;padding:16px 18px;font-size:13.5px;color:var(--ink-1);font-weight:500;line-height:1.65;margin:18px 0;}
+  .callout.strong{background:linear-gradient(135deg, rgba(0,114,251,0.10), rgba(153,197,255,0.18));border:1px solid rgba(0,114,251,0.20);}
+  .xlink{display:inline-flex;align-items:center;gap:5px;background:var(--chip);color:var(--blue);font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;border:1px solid rgba(0,114,251,0.25);text-decoration:none;margin:2px 0;}
   .xlink svg{width:11px;height:11px;flex-shrink:0;}
-  .placeholder-box{
-    border:1.5px dashed var(--blue-3); border-radius:14px; padding:16px 18px;
-    font-size:13px; color:var(--ink-3); margin:18px 0; background:rgba(153,197,255,0.08);
-  }
-  .placeholder-box b{color:var(--blue);}
-
-  .fab-row{
-    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
-    width:calc(100% - 40px); max-width:500px;
-    display:flex; gap:10px; z-index:6;
-  }
-  .fab{
-    flex:1; background:var(--blue); color:#fff; border:none; border-radius:14px;
-    padding:15px 16px; font-family:'Plus Jakarta Sans'; font-size:14px; font-weight:700;
-    display:flex; align-items:center; justify-content:center; gap:7px;
-    box-shadow:0 14px 30px rgba(0,114,251,0.30); cursor:pointer;
-  }
-  .fab.ghost{ background:#fff; color:var(--blue); border:1.5px solid var(--blue); box-shadow:0 8px 22px var(--shadow); flex:0 0 auto; width:52px;}
+  .fab-row{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:calc(100% - 40px);max-width:500px;display:flex;gap:10px;z-index:6;}
+  .fab{flex:1;background:var(--blue);color:#fff;border:none;border-radius:14px;padding:15px 16px;font-family:'Plus Jakarta Sans';font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 14px 30px rgba(0,114,251,0.30);cursor:pointer;}
+  .fab.ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue);box-shadow:0 8px 22px var(--shadow);flex:0 0 auto;width:52px;}
   .fab svg{width:16px;height:16px;}
-
-  /* index drawer */
-  #idxDrawer{
-    position:fixed; inset:0; z-index:20; display:none;
-    background:rgba(11,27,51,0.35); backdrop-filter:blur(2px);
-  }
+  #idxDrawer{position:fixed;inset:0;z-index:20;display:none;background:rgba(11,27,51,0.35);backdrop-filter:blur(2px);}
   #idxDrawer.show{display:block;}
-  .drawer-panel{
-    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    width:min(92vw, 420px); max-height:80vh; overflow-y:auto;
-    background:#fff; border-radius:20px; padding:10px 6px 16px;
-    box-shadow:0 30px 70px rgba(11,27,51,0.35);
-  }
+  .drawer-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw, 420px);max-height:80vh;overflow-y:auto;background:#fff;border-radius:20px;padding:10px 6px 16px;box-shadow:0 30px 70px rgba(11,27,51,0.35);}
   .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
   .drawer-head b{font-size:14px;}
   .drawer-close{width:28px;height:28px;border-radius:8px;background:var(--chip);border:none;color:var(--blue);cursor:pointer;}
@@ -207,61 +143,104 @@
 
 <div id="bg"><div class="mid"></div></div>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="back-btn" onclick="history.back()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+<!-- ============ SCREEN 1: FOLDERS ============ -->
+<div id="screen-folders">
+  <div class="top">
+    <div>
+      <div class="greet">Hola, <span id="nombreConsultante">Sofía</span></div>
+      <div class="sub" id="subGreeting">Francisco compartió estos recursos con vos</div>
     </div>
-    <div class="topbar-crumb">Nutrición Deportiva</div>
-    <div class="idx-btn" onclick="toggleDrawer(true)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    </div>
-  </div>
-  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-</div>
-
-<div class="doc" id="doc">
-  <div class="eyebrow">Nutrición Deportiva</div>
-  <h1 class="reader-h1">Alimentación y Rendimiento Deportivo</h1>
-  <div class="reader-sub">Periodizá tu nutrición, optimizá tu rendimiento y acelerá tu recuperación</div>
-  <div class="reader-byline">
-    <a href="https://www.instagram.com/nutricionfitust" target="_blank" rel="noopener">Francisco Ustarroz · @nutricionfitust</a>
+    <div class="avatar" id="avatarIniciales">SU</div>
   </div>
 
-  <div class="idx-card" id="indexCard"></div>
-  <div id="sections"></div>
+  <div class="folder open" data-folder="0">
+    <div class="folder-head" onclick="toggleFolder(0)">
+      <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <div class="folder-meta"><div class="folder-name">Nutrición Deportiva</div><div class="folder-count">1 de 2 listos</div></div>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="resource-list">
+      <div class="resource" onclick="openReader('rendimiento-deportivo')">
+        <div class="resource-dot"></div><div class="resource-title">Alimentación y Rendimiento Deportivo</div><div class="resource-arrow">→</div>
+      </div>
+      <div class="resource pending" onclick="showToast('Tu Planificación Nutricional individual todavía no está cargada acá')">
+        <div class="resource-dot"></div><div class="resource-title">Planificación Nutricional (tu plan individual)</div><div class="resource-tag">pronto</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folder" data-folder="1">
+    <div class="folder-head" onclick="toggleFolder(1)">
+      <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <div class="folder-meta"><div class="folder-name">Hábitos &amp; Estilo de Vida</div><div class="folder-count">— pendiente</div></div>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="resource-list"></div>
+  </div>
+
+  <div class="folder" data-folder="2">
+    <div class="folder-head" onclick="toggleFolder(2)">
+      <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <div class="folder-meta"><div class="folder-name">Herramientas</div><div class="folder-count">0 de 5 listos</div></div>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="resource-list">
+      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Guía de Suplementos</div><div class="resource-tag">pronto</div></div>
+      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Guía de Etiquetado Nutricional</div><div class="resource-tag">pronto</div></div>
+      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Ideas de Comidas Transportables</div><div class="resource-tag">pronto</div></div>
+      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Porciones de Intercambio</div><div class="resource-tag">pronto</div></div>
+      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Sistema de Puntos de Carbohidratos</div><div class="resource-tag">pronto</div></div>
+    </div>
+  </div>
+
+  <div class="ig-footer">
+    <a href="https://www.instagram.com/nutricionfitust" target="_blank" rel="noopener">
+      <svg class="ig-icon" viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="#0072FB" stroke="none"/></svg>
+      @nutricionfitust
+    </a>
+  </div>
 </div>
 
-<div class="fab-row">
-  <button class="fab ghost" onclick="toggleDrawer(true)" title="Índice">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-  </button>
-  <button class="fab" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
-    Descargar PDF
-  </button>
-</div>
+<div class="toast" id="toast"></div>
 
-<div id="idxDrawer" onclick="if(event.target===this) toggleDrawer(false)">
-  <div class="drawer-panel">
-    <div class="drawer-head"><b>Índice</b><button class="drawer-close" onclick="toggleDrawer(false)">✕</button></div>
-    <div id="drawerList"></div>
+<!-- ============ SCREEN 2: READER ============ -->
+<div id="screen-reader">
+  <div class="reader-top">
+    <div class="reader-bar">
+      <div class="back-btn" onclick="closeReader()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+      <div class="reader-crumb" id="readerCrumb">Nutrición Deportiva</div>
+      <div class="idx-btn" onclick="toggleDrawer(true)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="doc" id="doc">
+    <div class="eyebrow" id="readerEyebrow">Nutrición Deportiva</div>
+    <h1 class="reader-h1" id="readerH1">—</h1>
+    <div class="reader-sub" id="readerSub"></div>
+    <div class="reader-byline"><a href="https://www.instagram.com/nutricionfitust" target="_blank" rel="noopener">Francisco Ustarroz · @nutricionfitust</a></div>
+    <div class="idx-card" id="indexCard"></div>
+    <div id="sections"></div>
+  </div>
+  <div class="fab-row">
+    <button class="fab ghost" onclick="toggleDrawer(true)" title="Índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+    <button class="fab" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Descargar PDF</button>
+  </div>
+  <div id="idxDrawer" onclick="if(event.target===this) toggleDrawer(false)">
+    <div class="drawer-panel"><div class="drawer-head"><b>Índice</b><button class="drawer-close" onclick="toggleDrawer(false)">✕</button></div><div id="drawerList"></div></div>
   </div>
 </div>
 
 <script>
-/* ---------- block helpers ---------- */
-const h2 = t => ({t:'h2', v:t});
-const h3 = (t,emoji='') => ({t:'h3', v:t, emoji});
-const p  = t => ({t:'p', v:t});
-const ul = arr => ({t:'ul', v:arr});
-const ol = arr => ({t:'ol', v:arr});
-const callout = (t, strong=false) => ({t:'callout', v:t, strong});
-const xlink = (label, href, external=true) => ({t:'xlink', v:label, href, external});
-const placeholder = t => ({t:'placeholder', v:t});
+const h2=t=>({t:'h2',v:t}); const h3=(t,e='')=>({t:'h3',v:t,emoji:e}); const p=t=>({t:'p',v:t});
+const ul=a=>({t:'ul',v:a}); const ol=a=>({t:'ol',v:a}); const callout=(t,s=false)=>({t:'callout',v:t,strong:s});
+const xlink=(l,h,ext=true)=>({t:'xlink',v:l,href:h,external:ext});
 
-/* ---------- the full digitized document ---------- */
-const SECTIONS = [
+const RESOURCES = {
+'rendimiento-deportivo': {
+  crumb:'Nutrición Deportiva', eyebrow:'Nutrición Deportiva',
+  title:'Alimentación y Rendimiento Deportivo',
+  sub:'Periodizá tu nutrición, optimizá tu rendimiento y acelerá tu recuperación',
+  sections:[
 {id:'objetivos', num:1, title:'Objetivos', blocks:[
   p('Bienvenido a este proceso. En este plan vamos a trabajar con una estructura detallada, pensada para ordenar tu alimentación, reducir variables y llevar tus objetivos con mayor control.'),
   p('Mi rol es acompañarte en este camino, brindándote las herramientas necesarias para que puedas ejecutar el plan de forma clara, práctica y sostenible en el tiempo. Vos sos el protagonista, y este esquema está diseñado para ayudarte a avanzar con foco y coherencia.'),
@@ -341,11 +320,7 @@ const SECTIONS = [
   p('Cuando la sesión supera los 90 minutos, el glucógeno muscular comienza a agotarse. Sin un aporte externo de carbohidratos, el rendimiento cae y la fatiga aparece antes. Acá entra la estrategia intra-entrenamiento.'),
   h3('Carbohidratos intra-entrenamiento','⚡'),
   p('¿Cuándo aplicar esta estrategia? Sesiones de más de 75-90 minutos de esfuerzo continuo o intermitente de moderada a alta intensidad. No aplica a entrenamientos cortos o de baja intensidad.'),
-  ul([
-    '1 a 1,5 hs: 30 g HC/hora',
-    '1,5 a 2,5 hs: 30–60 g HC/hora',
-    'Más de 2,5 hs: 60 a 90 g HC/hora (recomendaciones teóricas — vamos ajustando según cómo te caiga)'
-  ]),
+  ul(['1 a 1,5 hs: 30 g HC/hora','1,5 a 2,5 hs: 30–60 g HC/hora','Más de 2,5 hs: 60 a 90 g HC/hora (recomendaciones teóricas — vamos ajustando según cómo te caiga)']),
   p('¿Qué consumir? (formatos de fácil digestión): bebidas isotónicas con carbohidratos (no zero), geles deportivos o gomitas energéticas, fruta trozada (banana, dátiles, pasas de uva, membrillo, naranja sin cáscara), caramelos de goma, o bebida rehidratante casera.'),
   callout('Tu receta: por litro de bebida (5-10% de hidratos) — 150 a 250 ml de jugo de limón o naranja exprimido + 40 a 80 g de azúcar + 1,5 g de sal de mesa (450-700 mg de sodio) + agua fría hasta completar 1 litro. Equivalente a un Gatorade/Powerade, más económica y personalizada.'),
   p('Qué evitar durante el esfuerzo prolongado: alimentos altos en fibra o grasa, fructosa sola en cantidades altas (>30 g/hora), proteína durante el esfuerzo — va antes y después.'),
@@ -356,14 +331,7 @@ const SECTIONS = [
 ]},
 {id:'timing', num:4, title:'Timing Nutricional', blocks:[
   p('¿Cuándo entrenás? Organizá tu día desde ahí. El timing no cambia qué comés — cambia cuándo lo comés. Y en el contexto deportivo, ese detalle hace una diferencia real en rendimiento, recuperación y composición corporal.'),
-  ul([
-    '🌅 Entrenás a la mañana temprano (6–8hs)',
-    '🌄 Entrenás a la mañana (9–11hs)',
-    '☀️ Entrenás al mediodía (12–14hs)',
-    '🌆 Entrenás a la tarde temprano (15–17hs)',
-    '🌇 Entrenás a la tarde (17–19hs)',
-    '🌙 Entrenás a la noche (20–22hs)'
-  ]),
+  ul(['🌅 Entrenás a la mañana temprano (6–8hs)','🌄 Entrenás a la mañana (9–11hs)','☀️ Entrenás al mediodía (12–14hs)','🌆 Entrenás a la tarde temprano (15–17hs)','🌇 Entrenás a la tarde (17–19hs)','🌙 Entrenás a la noche (20–22hs)']),
   p('Según tu horario de entrenamiento, tu día se organiza de una forma u otra. Encontrá tu caso y usalo como referencia para estructurar tus comidas.'),
   xlink('Abrí tu Timing correspondiente','https://timings-nutricionales.vercel.app/'),
   h3('Algunas aclaraciones importantes','⚠️'),
@@ -382,11 +350,7 @@ const SECTIONS = [
   h3('La sinergia que hace funcionar todo',''),
   p('En el post-entrenamiento, consumir carbohidratos y proteínas juntos genera un efecto mayor que cada uno por separado: los carbohidratos estimulan la insulina, que acelera la resíntesis de glucógeno y favorece la captación de aminoácidos. No compiten — se potencian.'),
   h3('Fuentes proteicas que priorizamos',''),
-  ul([
-    'Completas y de alta calidad: carnes magras, pescados blancos y azules, huevo entero y clara, lácteos altos en proteína.',
-    'Buenas fuentes complementarias: legumbres, quínoa, tofu, tempeh — también aportan carbohidratos.',
-    'Aporte moderado: avena, pan integral, frutos secos y semillas.'
-  ]),
+  ul(['Completas y de alta calidad: carnes magras, pescados blancos y azules, huevo entero y clara, lácteos altos en proteína.','Buenas fuentes complementarias: legumbres, quínoa, tofu, tempeh — también aportan carbohidratos.','Aporte moderado: avena, pan integral, frutos secos y semillas.']),
   p('¿Suplementación? No es obligatoria, pero es útil cuando el horario o el estilo de vida dificultan llegar al aporte proteico solo con alimentos. Whey (absorción rápida, post-entreno) o caseína (absorción lenta, antes de dormir). La suplementación complementa — no reemplaza — una alimentación bien estructurada.'),
   xlink('Guía de Suplementos NFU','https://drive.google.com/file/d/1jaW8AJ5cDJ54byF5B6Q1WJXRG6Tc1O7e/view')
 ]},
@@ -394,144 +358,72 @@ const SECTIONS = [
   p('Una deshidratación de apenas el 2% del peso corporal ya es suficiente para afectar la fuerza, la resistencia, la concentración y la toma de decisiones durante el esfuerzo.'),
   h3('Antes del entrenamiento','💧'),
   p('Referencia simple: tu peso al despertar en ayunas no debería variar más del 1% respecto al día anterior, y tu orina debería ser amarillo pálido a transparente.'),
-  ul([
-    '2 a 4 horas antes: 5-10 ml de líquido por kg de peso corporal.',
-    'Si la orina sigue oscura 2 horas antes: sumá 3-5 ml/kg adicionales.',
-    'Clima caluroso/húmedo: agregá 300-400 ml extra 15-20 min antes de arrancar.'
-  ]),
+  ul(['2 a 4 horas antes: 5-10 ml de líquido por kg de peso corporal.','Si la orina sigue oscura 2 horas antes: sumá 3-5 ml/kg adicionales.','Clima caluroso/húmedo: agregá 300-400 ml extra 15-20 min antes de arrancar.']),
   h3('Durante el entrenamiento','💧'),
   p('150-350 ml cada 15-20 minutos, sin esperar a tener sed.'),
-  ul([
-    'Menos de 60 min: agua sola o isotónica sin azúcar (zero).',
-    '60 a 90 min: isotónica CON hidratos, ~500 ml por hora.',
-    'Más de 90 min: isotónica con hidratos, ~1 litro por hora, o la receta casera de la sección de sesiones largas.'
-  ]),
+  ul(['Menos de 60 min: agua sola o isotónica sin azúcar (zero).','60 a 90 min: isotónica CON hidratos, ~500 ml por hora.','Más de 90 min: isotónica con hidratos, ~1 litro por hora, o la receta casera de la sección de sesiones largas.']),
   h3('Después del entrenamiento (recuperación)','💧'),
   p('Reponer el 150% del peso perdido durante las primeras 6 horas post-ejercicio (perdés 1 kg → tomá ~1,5 litros), de forma espaciada y con electrolitos, no de golpe. El sodio es clave para retener el líquido ingerido.'),
   h3('Qué tomar y qué evitar','🥤'),
-  ul([
-    '✅ Agua, aguas saborizadas sin azúcar, infusiones sin azúcar (mate, té, café), isotónica zero (<60min) o con HC (>60min), bebida casera (>90min), leche/chocolatada descremada post-entreno.',
-    '❌ Bebidas azucaradas y jugos industriales fuera de contexto deportivo, alcohol (deshidrata).',
-    'Energizantes: no hidratan bien, pero pueden ser un salvavidas puntual pre-entreno (versión Zero si comiste bien; con azúcar si estás en ayunas) — usalas solo como excepción.'
-  ])
+  ul(['✅ Agua, aguas saborizadas sin azúcar, infusiones sin azúcar (mate, té, café), isotónica zero (<60min) o con HC (>60min), bebida casera (>90min), leche/chocolatada descremada post-entreno.','❌ Bebidas azucaradas y jugos industriales fuera de contexto deportivo, alcohol (deshidrata).','Energizantes: no hidratan bien, pero pueden ser un salvavidas puntual pre-entreno (versión Zero si comiste bien; con azúcar si estás en ayunas) — usalas solo como excepción.'])
 ]},
 {id:'habitos', num:7, title:'Hábitos a Implementar', blocks:[
   p('El objetivo es incorporar hábitos clave que permitan optimizar el funcionamiento del cuerpo, el rendimiento diario y la sostenibilidad del proceso en el tiempo. No se trata de perfección, sino de consistencia.'),
-  h3('Romper el ayuno estratégicamente','🔁'),
-  p('Si ese día entrenás: proteínas + carbohidratos de moderado índice glucémico. Si es día de descanso: proteínas y grasas saludables. En ambos casos, evitá arrancar con azúcares simples o harinas refinadas.'),
-  h3('Regularidad en los horarios de comida','🔁'),
-  p('Comer en horarios similares todos los días tiene impacto fisiológico real: cuando los horarios son predecibles, la respuesta hormonal, el rendimiento y la tolerancia digestiva mejoran.'),
-  h3('Cena según el contexto del día','🔁'),
-  p('Si entrenaste tarde/noche: proteína completa + carbohidratos para reponer glucógeno + poca grasa. Si fue día de descanso o entreno matutino: cena más liviana. Siempre al menos 1,5 a 2 horas antes de dormir.'),
-  h3('Descanso — donde ocurre la adaptación real','🔁'),
-  p('El entrenamiento es el estímulo, el sueño es donde el cuerpo responde. Durante el sueño profundo se libera hormona de crecimiento, se regula la testosterona y se reparan las fibras musculares. Apuntá a un mínimo de 8 horas de sueño de calidad, con horario regular.'),
-  h3('Estructura alimentaria para acompañar el deporte','🔁'),
-  p('Las colaciones no son opcionales, son estratégicas. Organizá tu día en 4 comidas principales + tomas asociadas al entrenamiento. No dejes pasar más de 4-5 horas entre comidas principales. Orden sugerido: vegetales y proteína primero, luego carbohidratos y grasas.'),
-  h3('Evitar FODMAPs cerca del entrenamiento','🔁'),
-  p('Los alimentos ricos en carbohidratos fermentables pueden generar hinchazón y malestar digestivo, especialmente problemático en las horas previas al entrenamiento. No se trata de eliminarlos, sino de ser estratégico con el momento.'),
-  h3('Incluir alimentos antiinflamatorios','🔁'),
-  p('Omega-3 (pescados grasos, chía, lino, nueces), compuestos fenólicos y azufrados (brócoli, rúcula, cebolla, ajo, arándanos, frutillas, uvas moradas), antiinflamatorios directos (cúrcuma, jengibre).'),
-  h3('Incluir alimentos vasodilatadores','🔁'),
-  p('Remolacha, jugo de remolacha, rúcula, espinaca, acelga, lechuga, sandía, pepino — mejoran la perfusión sanguínea y la llegada de nutrientes al músculo.'),
-  h3('Incluir alimentos termogénicos','🔁'),
-  p('La cafeína (incluye mateína) es el termogénico dietario por excelencia y mejora el rendimiento directamente. Capsaicina, piperina y gingeroles comparten efecto termogénico.'),
-  h3('Registro consciente','🔁'),
-  p('No desde la obsesión, sino desde la atención: cómo te sentís antes y después de comer, cómo rinde tu cuerpo según lo que comiste. Ese feedback es información valiosa que ningún número te va a dar.'),
-  h3('No comer hasta llenarte','🔁'),
-  p('Terminá cada comida sintiéndote liviano. Comer lento, sin distracciones y con atención permite registrar la saciedad real antes de llegar al exceso.'),
-  h3('Preparaciones caseras sobre industriales','🔁'),
-  p('Controlá calidad y cantidades. Horno, plancha o salteado con mínimo aceite. Especias, hierbas, limón, vinagre para dar sabor sin depender de la sal en exceso.'),
-  h3('Estrategias para la ansiedad nocturna','🔁'),
-  p('Infusión digestiva caliente, cepillarte los dientes después de cenar, caminata suave post-cena. Si el hambre nocturna es real y frecuente, revisamos si la distribución de comidas del día está bien armada.'),
+  h3('Romper el ayuno estratégicamente','🔁'), p('Si ese día entrenás: proteínas + carbohidratos de moderado índice glucémico. Si es día de descanso: proteínas y grasas saludables. En ambos casos, evitá arrancar con azúcares simples o harinas refinadas.'),
+  h3('Regularidad en los horarios de comida','🔁'), p('Comer en horarios similares todos los días tiene impacto fisiológico real: cuando los horarios son predecibles, la respuesta hormonal, el rendimiento y la tolerancia digestiva mejoran.'),
+  h3('Cena según el contexto del día','🔁'), p('Si entrenaste tarde/noche: proteína completa + carbohidratos para reponer glucógeno + poca grasa. Si fue día de descanso o entreno matutino: cena más liviana. Siempre al menos 1,5 a 2 horas antes de dormir.'),
+  h3('Descanso — donde ocurre la adaptación real','🔁'), p('El entrenamiento es el estímulo, el sueño es donde el cuerpo responde. Durante el sueño profundo se libera hormona de crecimiento, se regula la testosterona y se reparan las fibras musculares. Apuntá a un mínimo de 8 horas de sueño de calidad, con horario regular.'),
+  h3('Estructura alimentaria para acompañar el deporte','🔁'), p('Las colaciones no son opcionales, son estratégicas. Organizá tu día en 4 comidas principales + tomas asociadas al entrenamiento. No dejes pasar más de 4-5 horas entre comidas principales. Orden sugerido: vegetales y proteína primero, luego carbohidratos y grasas.'),
+  h3('Evitar FODMAPs cerca del entrenamiento','🔁'), p('Los alimentos ricos en carbohidratos fermentables pueden generar hinchazón y malestar digestivo, especialmente problemático en las horas previas al entrenamiento. No se trata de eliminarlos, sino de ser estratégico con el momento.'),
+  h3('Incluir alimentos antiinflamatorios','🔁'), p('Omega-3 (pescados grasos, chía, lino, nueces), compuestos fenólicos y azufrados (brócoli, rúcula, cebolla, ajo, arándanos, frutillas, uvas moradas), antiinflamatorios directos (cúrcuma, jengibre).'),
+  h3('Incluir alimentos vasodilatadores','🔁'), p('Remolacha, jugo de remolacha, rúcula, espinaca, acelga, lechuga, sandía, pepino — mejoran la perfusión sanguínea y la llegada de nutrientes al músculo.'),
+  h3('Incluir alimentos termogénicos','🔁'), p('La cafeína (incluye mateína) es el termogénico dietario por excelencia y mejora el rendimiento directamente. Capsaicina, piperina y gingeroles comparten efecto termogénico.'),
+  h3('Registro consciente','🔁'), p('No desde la obsesión, sino desde la atención: cómo te sentís antes y después de comer, cómo rinde tu cuerpo según lo que comiste. Ese feedback es información valiosa que ningún número te va a dar.'),
+  h3('No comer hasta llenarte','🔁'), p('Terminá cada comida sintiéndote liviano. Comer lento, sin distracciones y con atención permite registrar la saciedad real antes de llegar al exceso.'),
+  h3('Preparaciones caseras sobre industriales','🔁'), p('Controlá calidad y cantidades. Horno, plancha o salteado con mínimo aceite. Especias, hierbas, limón, vinagre para dar sabor sin depender de la sal en exceso.'),
+  h3('Estrategias para la ansiedad nocturna','🔁'), p('Infusión digestiva caliente, cepillarte los dientes después de cenar, caminata suave post-cena. Si el hambre nocturna es real y frecuente, revisamos si la distribución de comidas del día está bien armada.'),
   callout('Constancia > Perfección. El progreso se construye con la repetición sostenida de hábitos correctos.', true)
 ]},
 {id:'fodmaps', num:8, title:'FODMAPs — Consideraciones', blocks:[
   p('Oligosacáridos, disacáridos, monosacáridos y polioles fermentables (lactosa, gluten, azúcar, alcohol) son alimentos que absorbiéndose lentamente contribuyen a la fermentación intestinal. Aunque no son "malos" en sí, pueden ser contraproducentes para tu rendimiento si tenés sensibilidad intestinal o simplemente te inflaman.'),
   h3('¿Qué puede pasar si comés FODMAPs antes de entrenar?',''),
-  ul([
-    'Hinchazón y gases.',
-    'Pesadez abdominal que interfiere con la movilidad y el foco mental.',
-    'Fatiga temprana durante el entrenamiento.',
-    'En algunos casos, urgencia intestinal o malestar general.'
-  ]),
+  ul(['Hinchazón y gases.','Pesadez abdominal que interfiere con la movilidad y el foco mental.','Fatiga temprana durante el entrenamiento.','En algunos casos, urgencia intestinal o malestar general.']),
   p('¿Qué hacemos en el plan? Las comidas previas al entrenamiento están diseñadas para ser bajas en FODMAPs y de fácil digestión. Las legumbres, por ejemplo, van mejor en el almuerzo de un día de descanso que en la comida previa a una sesión intensa.'),
   h3('¿Cómo contrarrestar los efectos negativos?',''),
-  ul([
-    'Fibra: contribuye al gas, pero reduce riesgo de cáncer colorrectal, alimenta la microbiota y refuerza el sistema inmune — la incorporamos de forma controlada.',
-    'Probióticos: refuerzan la microbiota intestinal.',
-    'Omega-3: ácido graso esencial antiinflamatorio.'
-  ])
+  ul(['Fibra: contribuye al gas, pero reduce riesgo de cáncer colorrectal, alimenta la microbiota y refuerza el sistema inmune — la incorporamos de forma controlada.','Probióticos: refuerzan la microbiota intestinal.','Omega-3: ácido graso esencial antiinflamatorio.'])
 ]},
 {id:'ayuno', num:9, title:'Ayuno, ¿Cuándo Suma y Cuándo No?', blocks:[
   p('El ayuno intermitente alterna períodos de ingesta con períodos sin consumir alimentos (ej: protocolo 16:8). Durante el ayuno el cuerpo disminuye la liberación de insulina, promoviendo el uso de grasas como fuente de energía.'),
   callout('No es obligatorio ayunar para obtener resultados, pero puede ser una excelente herramienta si se adapta a tu estilo de vida y rutina de entrenamiento.'),
   h3('¿Cuándo puede ser compatible?',''),
-  ul([
-    'Cuando entrenás a la tarde/noche y podés ubicar toda la alimentación alrededor del esfuerzo.',
-    'En días de descanso o entrenamiento de baja intensidad.',
-    'En etapas de recomposición corporal.',
-    'Cuando ya tenés una buena base de alimentación y buscás una herramienta adicional de gestión calórica.'
-  ]),
+  ul(['Cuando entrenás a la tarde/noche y podés ubicar toda la alimentación alrededor del esfuerzo.','En días de descanso o entrenamiento de baja intensidad.','En etapas de recomposición corporal.','Cuando ya tenés una buena base de alimentación y buscás una herramienta adicional de gestión calórica.']),
   h3('¿Cuándo puede ser contraproducente?',''),
-  ul([
-    'Si entrenás a la mañana temprano con alta intensidad o volumen.',
-    'Si tu volumen de entrenamiento semanal es alto.',
-    'Ventanas de alimentación muy cortas que dificultan cubrir el requerimiento proteico.',
-    'Si genera ansiedad, atracones o una relación poco saludable con la comida — no vale la pena.'
-  ]),
+  ul(['Si entrenás a la mañana temprano con alta intensidad o volumen.','Si tu volumen de entrenamiento semanal es alto.','Ventanas de alimentación muy cortas que dificultan cubrir el requerimiento proteico.','Si genera ansiedad, atracones o una relación poco saludable con la comida — no vale la pena.']),
   h3('Cómo romper el ayuno según el contexto',''),
   p('Si entrenás poco después: carbohidratos de moderado IG + proteína. Si rompés el ayuno lejos del entrenamiento o en descanso: proteínas y grasas saludables primero, carbohidratos complejos después.'),
   p('Una forma simple y sostenible de comenzar es con un ayuno de 12 horas (desde la cena hasta media mañana), ya que la mayor parte del tiempo se pasa durmiendo. Podés extenderlo con café negro, té sin azúcar o mate amargo.')
 ]},
 {id:'no-tan-fit', num:10, title:'Alimentos "No tan Fit"', blocks:[
   p('Una buena alimentación no tiene por qué ser perfecta todos los días, sino estratégica y sostenida en el tiempo. Incluir de manera ocasional y medida alimentos como alfajores, helados, chocolates o golosinas es posible y saludable desde el punto de vista emocional y conductual. Estos pueden formar parte en un 10-20% de tus decisiones.'),
-  h3('Frecuencia',''),
-  p('Entre 2 y 4 veces por semana, dependiendo de tus objetivos, nivel de entrenamiento y balance energético. No hace falta "esperar al fin de semana" — incluirlos durante la semana rompe con la mentalidad de "prohibido/permitido".'),
+  h3('Frecuencia',''), p('Entre 2 y 4 veces por semana, dependiendo de tus objetivos, nivel de entrenamiento y balance energético. No hace falta "esperar al fin de semana" — incluirlos durante la semana rompe con la mentalidad de "prohibido/permitido".'),
   h3('Horarios recomendados',''),
-  ul([
-    'Post entrenamiento: el mejor momento — tu cuerpo está más receptivo al uso de carbohidratos y los "permitidos" se usan eficientemente sin acumularse como grasa.',
-    'Media mañana o merienda: siempre acompañados de proteína (yogur, huevos, queso) y/o grasas saludables, para bajar la velocidad de absorción.'
-  ]),
-  h3('Estrategia y conciencia',''),
-  p('Evitalos en momentos de mucha hambre o ansiedad. No los comas con culpa: lo importante es que sea parte de un plan, no un "escape". Si sabés que vas a querer algo específico esa semana, planificalo.'),
+  ul(['Post entrenamiento: el mejor momento — tu cuerpo está más receptivo al uso de carbohidratos y los "permitidos" se usan eficientemente sin acumularse como grasa.','Media mañana o merienda: siempre acompañados de proteína (yogur, huevos, queso) y/o grasas saludables, para bajar la velocidad de absorción.']),
+  h3('Estrategia y conciencia',''), p('Evitalos en momentos de mucha hambre o ansiedad. No los comas con culpa: lo importante es que sea parte de un plan, no un "escape". Si sabés que vas a querer algo específico esa semana, planificalo.'),
   p('En la mayoría de los casos, una porción puntual dentro de un proceso bien sostenido no requiere ningún ajuste — el impacto aislado es mínimo.')
 ]},
 {id:'alcohol', num:11, title:'Alcohol', blocks:[
   p('¿Se puede tomar y aún así tener resultados? Sí. El consumo ocasional y consciente de alcohol puede tener lugar dentro del plan, siempre que se maneje con criterio.'),
   h3('Consecuencias del exceso',''),
-  ul([
-    'Inhibe la síntesis proteica muscular hasta 24 horas después de su consumo.',
-    'Compromete la recuperación: interfiere con la reposición de glucógeno y la reparación muscular.',
-    'Deshidrata: actúa como diurético.',
-    'Afecta la calidad del sueño profundo, justo cuando se libera hormona de crecimiento.',
-    'Puede disparar el apetito y dificultar las decisiones nutricionales del día siguiente.'
-  ]),
-  h3('Recomendaciones para incluirlo de forma estratégica',''),
-  p('No más de 1 a 2 veces por semana, siempre en moderación (1 copa de vino, 1 vaso de cerveza o 1 trago corto). En comidas principales con proteínas y grasas (ralentiza la absorción), nunca con el estómago vacío, idealmente en días de descanso o entrenamientos livianos.'),
+  ul(['Inhibe la síntesis proteica muscular hasta 24 horas después de su consumo.','Compromete la recuperación: interfiere con la reposición de glucógeno y la reparación muscular.','Deshidrata: actúa como diurético.','Afecta la calidad del sueño profundo, justo cuando se libera hormona de crecimiento.','Puede disparar el apetito y dificultar las decisiones nutricionales del día siguiente.']),
+  h3('Recomendaciones para incluirlo de forma estratégica',''), p('No más de 1 a 2 veces por semana, siempre en moderación (1 copa de vino, 1 vaso de cerveza o 1 trago corto). En comidas principales con proteínas y grasas (ralentiza la absorción), nunca con el estómago vacío, idealmente en días de descanso o entrenamientos livianos.'),
   h3('Opciones más "amigables"','🍷'),
-  ul([
-    'Vino tinto (1 copa): rico en polifenoles, con moderación.',
-    'Cerveza artesanal suave (1 vaso): menor graduación alcohólica.',
-    'Fernet con coca cero o light (1 vaso).',
-    'Gin con tónica sin azúcar y cítricos (1 vaso).',
-    'Agua saborizada casera con gas, hielo y frutas: para "simular" una bebida sin alcohol.'
-  ])
+  ul(['Vino tinto (1 copa): rico en polifenoles, con moderación.','Cerveza artesanal suave (1 vaso): menor graduación alcohólica.','Fernet con coca cero o light (1 vaso).','Gin con tónica sin azúcar y cítricos (1 vaso).','Agua saborizada casera con gas, hielo y frutas: para "simular" una bebida sin alcohol.'])
 ]},
 {id:'seleccion', num:12, title:'Selección y Formas de Preparación', blocks:[
   h3('Preparaciones saladas dietéticas o modificadas',''),
-  ul([
-    'Aceite crudo al final de la cocción; aceite en lugar de manteca o crema.',
-    'Agua para salteados, o aceite en spray / oliva extra virgen. Spray para untar asaderas.',
-    'Carnes sobre colchón de vegetales para evitar aceite y realzar sabor. Papel aluminio para conservar jugos.',
-    'Cortes de carne magros, retirar grasa visible y piel del pollo. Lácteos descremados.',
-    'Ampliar el uso de condimentos. Evitar frituras. Harinas integrales cuando sea posible.',
-    'Frutas y vegetales crudos, con cáscara, bien lavados. Vegetales que necesiten cocción: dejarles la cáscara por su aporte de fibra.'
-  ]),
+  ul(['Aceite crudo al final de la cocción; aceite en lugar de manteca o crema.','Agua para salteados, o aceite en spray / oliva extra virgen. Spray para untar asaderas.','Carnes sobre colchón de vegetales para evitar aceite y realzar sabor. Papel aluminio para conservar jugos.','Cortes de carne magros, retirar grasa visible y piel del pollo. Lácteos descremados.','Ampliar el uso de condimentos. Evitar frituras. Harinas integrales cuando sea posible.','Frutas y vegetales crudos, con cáscara, bien lavados. Vegetales que necesiten cocción: dejarles la cáscara por su aporte de fibra.']),
   h3('Preparaciones dietéticas o modificadas dulces',''),
-  ul([
-    'Edulcorante. Lácteos descremados.',
-    'Esencia de vainilla, canela, menta, anís estrellado, ralladura de cítricos.'
-  ]),
+  ul(['Edulcorante. Lácteos descremados.','Esencia de vainilla, canela, menta, anís estrellado, ralladura de cítricos.']),
   p('Para evitar repeticiones, el detalle completo de porciones, equivalencias e intercambios entre alimentos se desarrolla en el archivo específico Sistema de Porciones de Intercambio.'),
   xlink('Sistema de Porciones de Intercambio','#', false)
 ]},
@@ -547,7 +439,7 @@ const SECTIONS = [
     'Mantequilla de maní natural o crunchy: King, Croppers.',
     'Granolas sin "miel" como primer ingrediente en el rotulado. Cacao amargo puro en polvo: Dicomere, Dr. Cacao.',
     'Barritas proteicas: Low Carb, Integra, Not Snackbar Protein. Tostadas de arroz: Molinos Ala, Cerealitas.',
-    'Galletitas Cereal Mix sin harinas. Copos de maíz sin azúcar: Kellogg\'s Cornflakes, 3 Arroyos.',
+    'Galletitas Cereal Mix sin harinas. Copos de maíz sin azúcar: Kellogg\\'s Cornflakes, 3 Arroyos.',
     'Pan integral 100%, pan de centeno, pan de salvado: Fargo, Pan de Mesa Estilo Artesanal (tipo molde).',
     'Arvejas secas, lentejas, garbanzos: Arcor, Lucchetti, otras. Carnes: carnicerías propias, Coto, Carrefour.',
     'Aceites Natura, otras. Yerbas sin palos (marca a elección). Café molido tostado: Martínez, Cruzeiro, Cabrales.',
@@ -556,55 +448,36 @@ const SECTIONS = [
   ])
 ]},
 {id:'compras', num:14, title:'Ideas de Qué Comprar', blocks:[
-  h3('Frutas frescas','🍎'),
-  p('Manzana verde y/o roja, banana, frutillas, arándanos, sandía, melón, mandarina, naranja, ciruelas, duraznos, uvas, limones, kiwis, pera, palta, ananá, papaya, pomelo.'),
-  h3('Verduras y hortalizas','🥦'),
-  p('Espinaca, acelga, lechuga, rúcula, zapallito, zucchini, berenjena, pimiento rojo/verde, brócoli, cebolla, cebolla de verdeo, ajo, zanahoria, remolacha, tomate perita y cherry, pepino, papa, batata, choclo, ají.'),
-  h3('Lácteos deslactosados y derivados','🥛'),
-  p('Leche deslactosada descremada, yogures naturales sin azúcar, yogur deslactosado con frutas naturales, queso untable alto en proteínas (Tregar light, Finlandia light), quesos magros altos en proteínas y bajos en sodio, manteca de grasa animal (no vegetal, no margarina).'),
-  h3('Cereales, panificados y derivados','🍞'),
-  p('Pan integral o de masa madre (100% harina integral), pan negro/centeno/salvado, harinas integrales, fideos integrales, galletas de arroz integrales, galletitas integrales o con salvado, avena instantánea, quinoa, quinoa pops, granola sin azúcar, cereales sin azúcar agregada, arroz integral, copos de maíz sin azúcar.'),
-  h3('Legumbres y derivados','🫘'),
-  p('Preferir secas para remojar (bajas en sodio): lentejas, garbanzos, hummus natural, porotos negros, arvejas, soja texturizada, tofu, tempeh, harinas de legumbres.'),
-  h3('Carnes y proteínas animales','🍗'),
-  p('Pechugas de pollo, pata-muslo, pollo entero, cortes magros de cerdo (carré, solomillo, lomo, bondiola sin grasa), carne picada magra, cortes magros de vaca (nalga, cuadrada, lomo, bola de lomo, peceto, cuadril, bife angosto), jamón cocido natural sin azúcar ni almidón, huevo.'),
-  h3('Pescados azules (grasos + Omega-3)','🐟'),
-  p('Jurel, anchoa, caballa, atún, bonito, salmón, sardinas, trucha (fresco o en lata al agua).'),
-  h3('Pescados blancos (magros)','🐟'),
-  p('Merluza, lenguado, abadejo, corvina.'),
-  h3('Frutos secos y semillas','🥜'),
-  p('Nueces, nueces de pecan, almendras, avellanas, pistachos, maní pelado natural sin sal, castañas de cajú sin sal, piñones, mix de semillas (chía, lino, sésamo, girasol, calabaza, amapola).'),
-  h3('Otros alimentos útiles','🥫'),
-  p('Aceite de oliva extra virgen, aceite de girasol alto oleico, aceite blend, aceite de canola, aceite en spray, mantequilla de maní natural, cacao amargo en polvo, jugo de limón, miel, stevia, sucralosa, salsas zero calorías.'),
+  h3('Frutas frescas','🍎'), p('Manzana verde y/o roja, banana, frutillas, arándanos, sandía, melón, mandarina, naranja, ciruelas, duraznos, uvas, limones, kiwis, pera, palta, ananá, papaya, pomelo.'),
+  h3('Verduras y hortalizas','🥦'), p('Espinaca, acelga, lechuga, rúcula, zapallito, zucchini, berenjena, pimiento rojo/verde, brócoli, cebolla, cebolla de verdeo, ajo, zanahoria, remolacha, tomate perita y cherry, pepino, papa, batata, choclo, ají.'),
+  h3('Lácteos deslactosados y derivados','🥛'), p('Leche deslactosada descremada, yogures naturales sin azúcar, yogur deslactosado con frutas naturales, queso untable alto en proteínas (Tregar light, Finlandia light), quesos magros altos en proteínas y bajos en sodio, manteca de grasa animal (no vegetal, no margarina).'),
+  h3('Cereales, panificados y derivados','🍞'), p('Pan integral o de masa madre (100% harina integral), pan negro/centeno/salvado, harinas integrales, fideos integrales, galletas de arroz integrales, galletitas integrales o con salvado, avena instantánea, quinoa, quinoa pops, granola sin azúcar, cereales sin azúcar agregada, arroz integral, copos de maíz sin azúcar.'),
+  h3('Legumbres y derivados','🫘'), p('Preferir secas para remojar (bajas en sodio): lentejas, garbanzos, hummus natural, porotos negros, arvejas, soja texturizada, tofu, tempeh, harinas de legumbres.'),
+  h3('Carnes y proteínas animales','🍗'), p('Pechugas de pollo, pata-muslo, pollo entero, cortes magros de cerdo (carré, solomillo, lomo, bondiola sin grasa), carne picada magra, cortes magros de vaca (nalga, cuadrada, lomo, bola de lomo, peceto, cuadril, bife angosto), jamón cocido natural sin azúcar ni almidón, huevo.'),
+  h3('Pescados azules (grasos + Omega-3)','🐟'), p('Jurel, anchoa, caballa, atún, bonito, salmón, sardinas, trucha (fresco o en lata al agua).'),
+  h3('Pescados blancos (magros)','🐟'), p('Merluza, lenguado, abadejo, corvina.'),
+  h3('Frutos secos y semillas','🥜'), p('Nueces, nueces de pecan, almendras, avellanas, pistachos, maní pelado natural sin sal, castañas de cajú sin sal, piñones, mix de semillas (chía, lino, sésamo, girasol, calabaza, amapola).'),
+  h3('Otros alimentos útiles','🥫'), p('Aceite de oliva extra virgen, aceite de girasol alto oleico, aceite blend, aceite de canola, aceite en spray, mantequilla de maní natural, cacao amargo en polvo, jugo de limón, miel, stevia, sucralosa, salsas zero calorías.'),
   p('Condimentos — aromáticos: albahaca, azafrán, canela, cardamomo, cilantro, comino, cúrcuma, laurel, nuez moscada, orégano, perejil, romero, mostaza, tomillo, eneldo, clavo de olor, hinojo, menta. Ácidos: limón, vinagreta, aceto balsámico, lima. Picantes: jengibre, wasabi, pimienta, ají molido, pimentón, chile, curry. Aliáceos: cebolla de verdeo, cebolla, ajo, cebollín, echalote, puerro. Salsas caseras: provenzal, chimichurri, escabeche, pesto, salsa criolla, vinagreta.'),
   p('Té verde/negro/matcha/manzanilla/limón/menta/tilo/jengibre, café molido tostado, yerbas sin/con palo, levadura en polvo, gelatina light, germen de trigo, salvado de avena.')
 ]},
 {id:'organizacion', num:15, title:'Organización y Educación Alimentaria', blocks:[
-  h3('Paso 1 — Comenzá a construir tu alimentación',''),
-  p('Armá tu alimentación diaria de forma progresiva, usando este plan como guía. Buscá variedad de alimentos, colores, texturas y sabores, sin necesidad de hacerlo perfecto desde el primer día.'),
-  h3('Paso 2 — Armar lista de compras',''),
-  p('Hacela mirando tres cosas: tu planificación semanal de comidas, la heladera, y la alacena.'),
-  h3('Paso 3 — Estipular un día para ir al súper',''),
-  p('Si siempre te surge la excusa de "no tuve tiempo", estipulá un día fijo — ej: todos los sábados por la mañana.'),
+  h3('Paso 1 — Comenzá a construir tu alimentación',''), p('Armá tu alimentación diaria de forma progresiva, usando este plan como guía. Buscá variedad de alimentos, colores, texturas y sabores, sin necesidad de hacerlo perfecto desde el primer día.'),
+  h3('Paso 2 — Armar lista de compras',''), p('Hacela mirando tres cosas: tu planificación semanal de comidas, la heladera, y la alacena.'),
+  h3('Paso 3 — Estipular un día para ir al súper',''), p('Si siempre te surge la excusa de "no tuve tiempo", estipulá un día fijo — ej: todos los sábados por la mañana.'),
   h3('Paso 4 — Condición para ir de compras',''),
-  ul([
-    'Evitar ir con mucha hambre — te llenás de tentaciones difíciles de evitar.',
-    'Evitar pasar por góndolas que no suman si no necesitás nada de ahí.',
-    'Prestar atención a la zona de cajas: productos colocados estratégicamente para la compra impulsiva.'
-  ]),
+  ul(['Evitar ir con mucha hambre — te llenás de tentaciones difíciles de evitar.','Evitar pasar por góndolas que no suman si no necesitás nada de ahí.','Prestar atención a la zona de cajas: productos colocados estratégicamente para la compra impulsiva.']),
   h3('Paso 5 — El post-compras: ubicación en heladera y alacena',''),
   p('Heladera: frutas/verduras lavadas en cajones inferiores; carnes en el estante inferior (más frío, evita contaminación cruzada) en recipientes herméticos; huevos en estantes medios/superiores con la punta hacia abajo; comidas cocidas y lácteos en estantes medios/superiores.'),
   p('Alacena: papas, cebollas, ajos, calabazas, batatas, paltas inmaduras, bananas y tomates fuera de la heladera. No perecederos: legumbres, cereales, harinas, enlatados, aceites, especias.'),
-  h3('Paso 6 — Anticiparse',''),
-  p('Guardá en la heladera tuppers con arroz integral o legumbres ya cocidas. Cociná porciones de más y guardalas. Si cortás un alimento, cortá de más y freezá para una futura comida.'),
-  h3('Paso 7 — Evitar tener tentaciones',''),
-  p('Evitá comprar "por las dudas" galletitas, snacks, gaseosas, chocolates. En su lugar: frutas, frutos secos, verduras, alimentos naturales.'),
-  h3('Paso 8 — Tener colaciones a mano',''),
-  p('En casa y en tu bolso/mochila, tené colaciones a mano para evitar recurrir a opciones de baja calidad nutricional cuando te agarra el hambre.')
+  h3('Paso 6 — Anticiparse',''), p('Guardá en la heladera tuppers con arroz integral o legumbres ya cocidas. Cociná porciones de más y guardalas. Si cortás un alimento, cortá de más y freezá para una futura comida.'),
+  h3('Paso 7 — Evitar tener tentaciones',''), p('Evitá comprar "por las dudas" galletitas, snacks, gaseosas, chocolates. En su lugar: frutas, frutos secos, verduras, alimentos naturales.'),
+  h3('Paso 8 — Tener colaciones a mano',''), p('En casa y en tu bolso/mochila, tené colaciones a mano para evitar recurrir a opciones de baja calidad nutricional cuando te agarra el hambre.')
 ]}
-];
+  ]
+}
+};
 
-/* ---------- render ---------- */
 function blockHtml(b){
   switch(b.t){
     case 'h2': return `<div class="block-h2">${b.v}</div>`;
@@ -613,7 +486,6 @@ function blockHtml(b){
     case 'ul': return `<ul class="block-ul">${b.v.map(i=>`<li>${i}</li>`).join('')}</ul>`;
     case 'ol': return `<ol class="block-ol">${b.v.map(i=>`<li>${i}</li>`).join('')}</ol>`;
     case 'callout': return `<div class="callout${b.strong?' strong':''}">${b.v}</div>`;
-    case 'placeholder': return `<div class="placeholder-box"><b>Pendiente de conectar —</b> ${b.v}</div>`;
     case 'xlink': {
       const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 7h6v6M19 7L9 17M6 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg>`;
       const target = b.external ? ` target="_blank" rel="noopener"` : '';
@@ -623,44 +495,55 @@ function blockHtml(b){
   }
 }
 
-const sectionsEl = document.getElementById('sections');
-const indexEl = document.getElementById('indexCard');
-const drawerEl = document.getElementById('drawerList');
-
-let idxHtml = `<div class="idx-card-title">Índice — tocá lo que quieras leer</div>`;
-let drawerHtml = '';
-
-SECTIONS.forEach(sec=>{
-  const secHtml = document.createElement('section');
-  secHtml.className = 'sec';
-  secHtml.id = sec.id;
-  secHtml.innerHTML = `<div class="block-h2" style="margin-top:0;">${sec.num}. ${sec.title}</div>` + sec.blocks.map(blockHtml).join('');
-  sectionsEl.appendChild(secHtml);
-
-  const rowHtml = `<a class="idx-item" href="#${sec.id}"><span class="idx-num">${sec.num}</span>${sec.title}</a>`;
-  idxHtml += rowHtml;
-  drawerHtml += rowHtml.replace('idx-item', 'idx-item').replace('href=', `onclick="toggleDrawer(false)" href=`);
-});
-
-indexEl.innerHTML = idxHtml;
-drawerEl.innerHTML = drawerHtml;
-
-function toggleDrawer(open){
-  document.getElementById('idxDrawer').classList.toggle('show', open);
+function toggleFolder(i){
+  document.querySelectorAll('.folder').forEach(f=>{ if(parseInt(f.dataset.folder)!==i) f.classList.remove('open'); });
+  document.querySelector('[data-folder="'+i+'"]').classList.toggle('open');
 }
 
-/* progress bar across whole doc */
-window.addEventListener('scroll', ()=>{
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  const pct = max>0 ? (window.scrollY/max)*100 : 0;
-  document.getElementById('progressFill').style.width = pct+'%';
-});
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
 
-/* best-effort desktop zoom blocking — see note below the code */
-document.addEventListener('wheel', e=>{ if(e.ctrlKey) e.preventDefault(); }, {passive:false});
-document.addEventListener('keydown', e=>{
-  if((e.ctrlKey||e.metaKey) && ['+','-','=','0'].includes(e.key)) e.preventDefault();
+function openReader(key){
+  const r = RESOURCES[key];
+  if(!r){ showToast('Todavía no está cargado'); return; }
+  document.getElementById('readerCrumb').textContent = r.crumb;
+  document.getElementById('readerEyebrow').textContent = r.eyebrow;
+  document.getElementById('readerH1').textContent = r.title;
+  document.getElementById('readerSub').textContent = r.sub;
+
+  let idxHtml = `<div class="idx-card-title">Índice — tocá lo que quieras leer</div>`;
+  let drawerHtml = '';
+  const sectionsEl = document.getElementById('sections');
+  sectionsEl.innerHTML = '';
+  r.sections.forEach(sec=>{
+    const secEl = document.createElement('section');
+    secEl.className='sec'; secEl.id=sec.id;
+    secEl.innerHTML = `<div class="block-h2" style="margin-top:0;">${sec.num}. ${sec.title}</div>` + sec.blocks.map(blockHtml).join('');
+    sectionsEl.appendChild(secEl);
+    const row = `<a class="idx-item" href="#${sec.id}"><span class="idx-num">${sec.num}</span>${sec.title}</a>`;
+    idxHtml += row;
+    drawerHtml += row.replace('href=', `onclick="toggleDrawer(false)" href=`);
+  });
+  document.getElementById('indexCard').innerHTML = idxHtml;
+  document.getElementById('drawerList').innerHTML = drawerHtml;
+
+  document.getElementById('screen-reader').classList.add('show');
+  document.getElementById('screen-reader').scrollTop = 0;
+}
+function closeReader(){ document.getElementById('screen-reader').classList.remove('show'); }
+function toggleDrawer(open){ document.getElementById('idxDrawer').classList.toggle('show', open); }
+
+document.getElementById('screen-reader').addEventListener('scroll', function(){
+  const max = this.scrollHeight - this.clientHeight;
+  document.getElementById('progressFill').style.width = (max>0?(this.scrollTop/max)*100:0)+'%';
 });
+document.addEventListener('wheel', e=>{ if(e.ctrlKey) e.preventDefault(); }, {passive:false});
+document.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey) && ['+','-','=','0'].includes(e.key)) e.preventDefault(); });
 document.addEventListener('gesturestart', e=> e.preventDefault());
 </script>
 </body>
