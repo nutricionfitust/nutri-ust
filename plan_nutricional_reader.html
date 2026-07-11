@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>NutriUst — Alimentación y Rendimiento Deportivo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  :root{
+    --blue:#0072FB;
+    --blue-2:#6EA4FB;
+    --blue-3:#99C5FF;
+    --ink-1:#0B1B33;
+    --ink-2:#3E4E75;
+    --ink-3:#8592B4;
+    --card:#FFFFFF;
+    --line:#DCE6F8;
+    --chip:#EAF2FF;
+    --shadow:rgba(20,60,140,0.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; touch-action:manipulation;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    color:var(--ink-1);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* ---------- fixed diffused celeste/blue/white background ---------- */
+  #bg{
+    position:fixed; inset:0; z-index:-1;
+    background:#FBFDFF;
+  }
+  #bg::before, #bg::after{
+    content:'';
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+  }
+  #bg::before{
+    width:70vw;height:70vw;max-width:900px;max-height:900px;
+    top:-25vw; left:-20vw;
+    background:radial-gradient(circle, rgba(0,114,251,0.40) 0%, rgba(0,114,251,0.16) 45%, transparent 72%);
+  }
+  #bg::after{
+    width:65vw;height:65vw;max-width:820px;max-height:820px;
+    bottom:-28vw; right:-18vw;
+    background:radial-gradient(circle, rgba(153,197,255,0.55) 0%, rgba(110,164,251,0.22) 48%, transparent 72%);
+  }
+  #bg .mid{
+    position:absolute; top:30%; left:50%; transform:translate(-50%,-50%);
+    width:60vw;height:60vw;max-width:760px;max-height:760px;
+    border-radius:50%; filter:blur(85px);
+    background:radial-gradient(circle, rgba(110,164,251,0.30) 0%, transparent 70%);
+  }
+
+  /* ---------- top bar / index ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:5;
+    background:rgba(251,253,255,0.82);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:900px; margin:0 auto;
+    display:flex; align-items:center; gap:12px;
+    padding:14px 18px;
+  }
+  .back-btn, .idx-btn{
+    width:36px;height:36px;border-radius:11px;
+    background:var(--chip); border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--blue); cursor:pointer; flex-shrink:0;
+  }
+  .topbar-crumb{
+    font-family:'DM Mono', monospace; font-size:11px;
+    color:var(--ink-3); text-transform:uppercase; letter-spacing:0.07em;
+    flex:1;
+  }
+  .progress-track{height:3px;background:var(--line);}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-2));transition:width .08s linear;}
+
+  /* ---------- reading column: mobile default, widens like a paper on desktop ---------- */
+  .doc{
+    max-width:640px;
+    margin:0 auto;
+    padding:28px 20px 100px;
+  }
+  @media (min-width:900px){
+    .doc{
+      max-width:760px;
+      padding:56px 40px 140px;
+      font-size:16px;
+    }
+    .doc .reader-h1{font-size:32px;}
+    .doc .block-h2{font-size:20px;}
+    .doc .block-h3{font-size:16.5px;}
+    .doc .block-p, .doc .block-ul li{font-size:15.5px; line-height:1.85;}
+  }
+  @media (min-width:1300px){
+    .doc{max-width:800px;}
+  }
+
+  .eyebrow{
+    display:inline-flex; font-family:'DM Mono', monospace; font-size:11px;
+    color:var(--blue); letter-spacing:0.09em; text-transform:uppercase; margin-bottom:12px;
+  }
+  .reader-h1{font-size:25px;font-weight:800;line-height:1.24;letter-spacing:-0.01em;margin:0 0 8px;}
+  .reader-sub{font-size:13.5px;color:var(--ink-3);margin-bottom:8px;}
+  .reader-byline{font-size:12.5px;color:var(--ink-3);margin-bottom:30px;display:flex;align-items:center;gap:8px;}
+  .reader-byline a{color:var(--blue);text-decoration:none;font-weight:600;}
+
+  /* index card */
+  .idx-card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:8px 6px; margin-bottom:34px;
+    box-shadow:0 10px 30px var(--shadow);
+  }
+  .idx-card-title{
+    font-family:'DM Mono', monospace; font-size:10.5px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--ink-3); padding:10px 16px 4px;
+  }
+  .idx-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 16px; border-radius:10px; cursor:pointer;
+    text-decoration:none; color:var(--ink-1); font-size:13.5px; font-weight:500;
+  }
+  .idx-item:hover{background:var(--chip);}
+  .idx-num{
+    font-family:'DM Mono', monospace; font-size:11px; color:var(--blue);
+    width:20px; flex-shrink:0;
+  }
+
+  section.sec{scroll-margin-top:90px; margin-bottom:8px;}
+  .block-h2{
+    font-size:18px;font-weight:700;color:var(--blue);
+    margin:36px 0 12px; padding-left:13px; border-left:3px solid var(--blue);
+  }
+  .block-h3{
+    font-size:14.5px;font-weight:700;color:var(--ink-1);margin:20px 0 8px;
+    display:flex; align-items:center; gap:7px;
+  }
+  .block-p{font-size:14.5px;line-height:1.75;color:var(--ink-2);margin:0 0 13px;}
+  .block-ul{margin:0 0 15px;padding-left:0;list-style:none;}
+  .block-ul li{
+    font-size:14px;line-height:1.65;color:var(--ink-2);
+    padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line);
+  }
+  .block-ul li:last-child{border-bottom:none;}
+  .block-ul li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--blue-2);}
+  .block-ol{margin:0 0 15px;padding-left:22px;color:var(--ink-2);font-size:14px;line-height:1.7;}
+  .block-ol li{margin-bottom:8px;}
+  .callout{
+    background:var(--chip); border-radius:14px; padding:16px 18px;
+    font-size:13.5px; color:var(--ink-1); font-weight:500; line-height:1.65; margin:18px 0;
+  }
+  .callout.strong{background:linear-gradient(135deg, rgba(0,114,251,0.10), rgba(153,197,255,0.18)); border:1px solid rgba(0,114,251,0.20);}
+  .xlink{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--chip);color:var(--blue);font-size:13px;font-weight:600;
+    padding:3px 10px;border-radius:8px;border:1px solid rgba(0,114,251,0.25);
+    text-decoration:none; margin:2px 0;
+  }
+  .xlink svg{width:11px;height:11px;flex-shrink:0;}
+  .placeholder-box{
+    border:1.5px dashed var(--blue-3); border-radius:14px; padding:16px 18px;
+    font-size:13px; color:var(--ink-3); margin:18px 0; background:rgba(153,197,255,0.08);
+  }
+  .placeholder-box b{color:var(--blue);}
+
+  .fab-row{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    width:calc(100% - 40px); max-width:500px;
+    display:flex; gap:10px; z-index:6;
+  }
+  .fab{
+    flex:1; background:var(--blue); color:#fff; border:none; border-radius:14px;
+    padding:15px 16px; font-family:'Plus Jakarta Sans'; font-size:14px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    box-shadow:0 14px 30px rgba(0,114,251,0.30); cursor:pointer;
+  }
+  .fab.ghost{ background:#fff; color:var(--blue); border:1.5px solid var(--blue); box-shadow:0 8px 22px var(--shadow); flex:0 0 auto; width:52px;}
+  .fab svg{width:16px;height:16px;}
+
+  /* index drawer */
+  #idxDrawer{
+    position:fixed; inset:0; z-index:20; display:none;
+    background:rgba(11,27,51,0.35); backdrop-filter:blur(2px);
+  }
+  #idxDrawer.show{display:block;}
+  .drawer-panel{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:min(92vw, 420px); max-height:80vh; overflow-y:auto;
+    background:#fff; border-radius:20px; padding:10px 6px 16px;
+    box-shadow:0 30px 70px rgba(11,27,51,0.35);
+  }
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
+  .drawer-head b{font-size:14px;}
+  .drawer-close{width:28px;height:28px;border-radius:8px;background:var(--chip);border:none;color:var(--blue);cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="bg"><div class="mid"></div></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="back-btn" onclick="history.back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="topbar-crumb">Nutrición Deportiva</div>
+    <div class="idx-btn" onclick="toggleDrawer(true)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="doc" id="doc">
+  <div class="eyebrow">Nutrición Deportiva</div>
+  <h1 class="reader-h1">Alimentación y Rendimiento Deportivo</h1>
+  <div class="reader-sub">Periodizá tu nutrición, optimizá tu rendimiento y acelerá tu recuperación</div>
+  <div class="reader-byline">
+    <a href="https://www.instagram.com/nutricionfitust" target="_blank" rel="noopener">Francisco Ustarroz · @nutricionfitust</a>
+  </div>
+
+  <div class="idx-card" id="indexCard"></div>
+  <div id="sections"></div>
+</div>
+
+<div class="fab-row">
+  <button class="fab ghost" onclick="toggleDrawer(true)" title="Índice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+  </button>
+  <button class="fab" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+    Descargar PDF
+  </button>
+</div>
+
+<div id="idxDrawer" onclick="if(event.target===this) toggleDrawer(false)">
+  <div class="drawer-panel">
+    <div class="drawer-head"><b>Índice</b><button class="drawer-close" onclick="toggleDrawer(false)">✕</button></div>
+    <div id="drawerList"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- block helpers ---------- */
+const h2 = t => ({t:'h2', v:t});
+const h3 = (t,emoji='') => ({t:'h3', v:t, emoji});
+const p  = t => ({t:'p', v:t});
+const ul = arr => ({t:'ul', v:arr});
+const ol = arr => ({t:'ol', v:arr});
+const callout = (t, strong=false) => ({t:'callout', v:t, strong});
+const xlink = (label, href, external=true) => ({t:'xlink', v:label, href, external});
+const placeholder = t => ({t:'placeholder', v:t});
+
+/* ---------- the full digitized document ---------- */
+const SECTIONS = [
+{id:'objetivos', num:1, title:'Objetivos', blocks:[
+  p('Bienvenido a este proceso. En este plan vamos a trabajar con una estructura detallada, pensada para ordenar tu alimentación, reducir variables y llevar tus objetivos con mayor control.'),
+  p('Mi rol es acompañarte en este camino, brindándote las herramientas necesarias para que puedas ejecutar el plan de forma clara, práctica y sostenible en el tiempo. Vos sos el protagonista, y este esquema está diseñado para ayudarte a avanzar con foco y coherencia.'),
+  h2('Objetivo General'),
+  p('Optimizar el rendimiento deportivo y la composición corporal mediante una distribución inteligente de macronutrientes a lo largo del día, considerando el nivel de actividad física, los horarios habituales, el momento del entrenamiento y las demandas de energía y recuperación individual.'),
+  h2('Objetivos Específicos'),
+  ul([
+    'Periodizar el aporte de carbohidratos según la demanda energética real de cada día (entrenamiento vs. descanso), priorizando fuentes y cantidades según el momento del día y la duración del esfuerzo.',
+    'Sostener o aumentar la masa muscular mediante un aporte proteico adecuado, evaluando su distribución a lo largo del día y priorizando los momentos de mayor impacto (pre y post entrenamiento cuando la distribución no es óptima).',
+    'Mejorar la recuperación y la adaptación al entrenamiento a través de una nutrición estratégica que favorezca la reposición de glucógeno, la síntesis proteica y la reducción del daño muscular.',
+    'Desarrollar hábitos alimentarios sostenibles que acompañen el proceso deportivo a largo plazo, con herramientas concretas para tomar decisiones nutricionales en distintos contextos (entrenamiento, vida social, viajes, etc.).'
+  ]),
+  callout('Con el plan no buscamos la perfección, sino precisión con criterio. No existen alimentos prohibidos, pero sí elecciones más alineadas a tus objetivos actuales.', true),
+  p('Vamos paso a paso, con foco y coherencia.')
+]},
+{id:'bases', num:2, title:'Bases del Enfoque', blocks:[
+  p('En función de tus objetivos deportivos y/o de tu entrenamiento actual, este plan se apoya en principios de nutrición deportiva aplicada, con un enfoque estructurado, preciso y adaptable, diseñado para optimizar el rendimiento, la composición corporal y la recuperación.'),
+  p('Las siguientes bases definen cómo y por qué se organiza tu alimentación.'),
+  h3('Proteínas','✅'),
+  p('La proteína es un macronutriente muy importante. Su función va más allá de "construir músculo": es clave para la recuperación del tejido muscular dañado por el entrenamiento, la síntesis de enzimas y hormonas, y el mantenimiento de la masa magra durante etapas de déficit energético.'),
+  p('El requerimiento diario se establece de forma individualizada según tu peso, objetivo y volumen de entrenamiento. La distribución a lo largo del día importa: idealmente, distribuís la proteína en todas tus comidas para mantener un estímulo constante de síntesis proteica. Si tu estilo de vida no lo permite, priorizamos los momentos de mayor impacto como el post-entrenamiento y antes de dormir.'),
+  p('Priorizamos fuentes de alto valor biológico: carnes, huevos, lácteos, legumbres y cereales complementados y, si fuera necesario, suplementos como whey o caseína si se justifica el contexto.'),
+  h3('Carbohidratos: periodización según demanda real y timing','✅'),
+  p('No todos los días son iguales, y tu alimentación tampoco debería serlo. Los carbohidratos son el combustible principal del esfuerzo de moderada a alta intensidad, y su aporte se ajusta según la demanda energética de cada día:'),
+  ul([
+    'Días de entrenamiento: mayor aporte de carbohidratos, distribuidos estratégicamente antes y después del entrenamiento.',
+    'Días sin entrenamiento: reducción moderada, con énfasis en carbohidratos complejos, fibrosos y de bajo índice glucémico. Las grasas y las proteínas tienen mayor peso relativo en el balance energético del día.',
+    'Entrenamientos de más de 90 minutos: se incorpora una estrategia de carbohidratos intra-entrenamiento para sostener el rendimiento y retrasar la fatiga.'
+  ]),
+  p('Dentro de este plan vas a encontrar referencias al Sistema de Puntos de Carbohidratos, un archivo complementario donde cada alimento tiene asignado un puntaje (1 punto = 1 g de hidrato de carbono). Eso te va a permitir armar tus comidas con criterio y sin contar calorías de forma obsesiva.'),
+  xlink('Sistema de Puntos de Carbohidratos','https://sistema-de-puntos-hc-nfu.vercel.app/'),
+  h3('Grasas: rendimiento, hormonas y recuperación','✅'),
+  p('Fundamentales para el equilibrio hormonal, la salud celular, la absorción de vitaminas liposolubles (A, D, E, K) y la saciedad. Las grasas se evitan en grandes cantidades cerca del entrenamiento, ya que enlentecen el vaciamiento gástrico y pueden generar malestar digestivo. Su mayor aporte lo ubicamos en comidas alejadas del esfuerzo físico: aceite de oliva, palta, frutos secos, semillas, yema de huevo, pescados grasos.'),
+  h3('Distribución energética inteligente','✅'),
+  p('La organización de tus comidas a lo largo del día es tan importante como su contenido. Buscamos que los nutrientes estén disponibles en el momento en que el cuerpo más los necesita: energía antes del esfuerzo, recuperación después, y mantenimiento en el resto del día. Esto es el "timing nutricional", explicado más adelante.'),
+  h3('Planificación y Educación nutricional','✅'),
+  p('No trabajamos con alimentos prohibidos, sino con prioridades y contexto. Vas a aprender a tomar decisiones nutricionales en distintos escenarios: entrenamientos exigentes, días de descanso, salidas sociales, viajes. La adherencia sostenida en el tiempo es lo que genera resultados reales.'),
+  h3('Aspectos complementarios para sostener el plan','✅'),
+  p('A lo largo del documento vas a encontrar estrategias para sostener el esquema en contextos reales: cómo manejarte con el alcohol sin tirar el proceso, qué hacer en salidas sociales, cómo organizar tus comidas cuando tenés poco tiempo, y recetas adaptadas al esquema nutricional.')
+]},
+{id:'periodizacion-entreno', num:'3a', title:'Periodización — Día de Entrenamiento', blocks:[
+  p('El día que entrenás es el de mayor demanda energética. La estructura se organiza en función del momento del entrenamiento — lo importante no es cuándo entrenás, sino que los nutrientes correctos estén disponibles antes y después.'),
+  h3('Carbohidratos — mayor aporte, con criterio de timing','🍞'),
+  p('El aporte total de carbohidratos es el más alto de la semana. Tus valores personales los desarrollamos en el archivo de Lineamientos. El tipo de carbohidrato cambia según el momento:'),
+  ul([
+    'A lo largo del día (alejado del entrenamiento): fuentes complejas, fibrosas y de bajo a moderado índice glucémico — vegetales, frutas enteras, cereales integrales, legumbres, pan integral.',
+    'Pre-entrenamiento: moderado índice glucémico, fácil digestión, baja fibra y grasas — banana, avena cocida, pan blanco con mermelada o miel, arroz blanco. Referencia: ~1 g HC/kg por cada hora previa al entrenamiento.',
+    'Post-entrenamiento (primeras 4-6hs): carbohidratos de alto índice glucémico, en proporción de 3:1 a 4:1 sobre las proteínas, consumidos idealmente dentro de los primeros 30-60 minutos.'
+  ]),
+  h3('Proteínas — distribución y prioridades','💪'),
+  p('El requerimiento proteico total no suele variar entre días de entreno y descanso — lo que cambia es el timing. Lo ideal es distribuir las proteínas en todas tus comidas (cada 3-4 horas). Si no podés, priorizá en este orden:'),
+  ol([
+    'Pre-entrenamiento: una buena comida con proteína 1-3 horas antes mantiene aminoácidos elevados en sangre durante e incluso después del entrenamiento.',
+    'Post-entrenamiento: 0,25–0,40 g/kg dentro de las primeras 2 horas post-esfuerzo (20–40 g de proteína de alto valor biológico). Clave si tu última comida con proteína fue hace 5-6hs o entrenás en ayunas.',
+    'Antes de dormir: 30-40 g de proteínas, de absorción lenta (caseína) o mediante una cena sólida (carnes magras + carbohidratos complejos).'
+  ]),
+  h3('Grasas — rol y restricciones de timing','🥑'),
+  p('Evitar en grandes cantidades cerca del entrenamiento (1-2 horas antes y en el post-entreno inmediato): enlentecen el vaciamiento gástrico. Mayor aporte en comidas alejadas del esfuerzo: desayuno, almuerzo (si está lejos del entreno), cena — aceite de oliva, palta, frutos secos, yema de huevo, pescados grasos, semillas.')
+]},
+{id:'periodizacion-descanso', num:'3b', title:'Periodización — Día sin Entrenamiento', blocks:[
+  p('Los días que no entrenás el gasto energético baja considerablemente. Esto no significa que la nutrición sea menos importante: es el día donde el cuerpo consolida las adaptaciones, repara tejidos y recarga reservas. La clave es ajustar sin descuidar.'),
+  h3('Carbohidratos — menos cantidad, mejor calidad','🍞'),
+  p('El aporte total de carbohidratos es algo más bajo. Sin la demanda del entrenamiento, el cuerpo no necesita glucosa de disponibilidad rápida. Priorizá fuentes complejas, fibrosas y de bajo índice glucémico durante todo el día:'),
+  ul([
+    'Vegetales no almidonados en abundancia. Frutas enteras de baja carga glucídica (manzana, pera, kiwi, frutos rojos, cítricos). Cereales integrales, legumbres, pan integral en cantidades ajustadas.',
+    'Meta de fibra ≥30 g/día: mejora la barrera intestinal, regula el metabolismo muscular y reduce la inflamación.',
+    'Evitar fuentes de alto IG (arroz blanco en cantidad, frutas muy maduras en grandes porciones, jugos, dulces): sin el estímulo del entreno, esa glucosa tiene más chances de ir hacia reservas adiposas.'
+  ]),
+  h3('Proteínas — las mantenemos igual','💪'),
+  p('El requerimiento proteico NO se baja los días de descanso. La recuperación y remodelación muscular continúan incluso sin entrenamiento — el estímulo de síntesis proteica dura hasta 24-48 horas después de tu última sesión de fuerza. Sostené el mismo aporte, distribuido en todas tus comidas.'),
+  h3('Grasas — mayor peso relativo','🥑'),
+  p('Al reducir los carbohidratos, las grasas tienen mayor participación relativa en el balance energético del día. No se trata de agregar más grasas, sino de que con menos carbohidratos, las fuentes habituales representan un porcentaje mayor del día. Dicho en criollo: las dejamos igual.'),
+  h3('NEAT — a meterle pata','🚶'),
+  p('Los días sin entrenamiento formal son una oportunidad clave para elevar el NEAT (gasto por actividad no estructurada): caminá más, usá escaleras, evitá estar sentado/a horas sin moverte. Esto aumenta el gasto diario sin comprometer la recuperación y mejora la sensibilidad a la insulina.')
+]},
+{id:'periodizacion-90', num:'3c', title:'Periodización — Sesiones de +90 Minutos', blocks:[
+  p('Cuando la sesión supera los 90 minutos, el glucógeno muscular comienza a agotarse. Sin un aporte externo de carbohidratos, el rendimiento cae y la fatiga aparece antes. Acá entra la estrategia intra-entrenamiento.'),
+  h3('Carbohidratos intra-entrenamiento','⚡'),
+  p('¿Cuándo aplicar esta estrategia? Sesiones de más de 75-90 minutos de esfuerzo continuo o intermitente de moderada a alta intensidad. No aplica a entrenamientos cortos o de baja intensidad.'),
+  ul([
+    '1 a 1,5 hs: 30 g HC/hora',
+    '1,5 a 2,5 hs: 30–60 g HC/hora',
+    'Más de 2,5 hs: 60 a 90 g HC/hora (recomendaciones teóricas — vamos ajustando según cómo te caiga)'
+  ]),
+  p('¿Qué consumir? (formatos de fácil digestión): bebidas isotónicas con carbohidratos (no zero), geles deportivos o gomitas energéticas, fruta trozada (banana, dátiles, pasas de uva, membrillo, naranja sin cáscara), caramelos de goma, o bebida rehidratante casera.'),
+  callout('Tu receta: por litro de bebida (5-10% de hidratos) — 150 a 250 ml de jugo de limón o naranja exprimido + 40 a 80 g de azúcar + 1,5 g de sal de mesa (450-700 mg de sodio) + agua fría hasta completar 1 litro. Equivalente a un Gatorade/Powerade, más económica y personalizada.'),
+  p('Qué evitar durante el esfuerzo prolongado: alimentos altos en fibra o grasa, fructosa sola en cantidades altas (>30 g/hora), proteína durante el esfuerzo — va antes y después.'),
+  h3('Proteínas — antes y después, como siempre','💪'),
+  p('Pre: buena comida con proteína 1-3 horas antes del esfuerzo. Post: 0,25–0,40 g/kg dentro de las primeras 2 horas, combinada con carbohidratos de alto IG. Antes de dormir: 30-40 g de proteína de absorción lenta.'),
+  h3('Hidratación — crítica en sesiones largas','💧'),
+  p('Con más de 90 minutos, la pérdida de sodio por sudor se vuelve significativa. El agua sola no es suficiente — incorporá electrolitos: bebida isotónica comercial, bebida casera con sal, o alimentos con sodio dentro de la estrategia intra. Protocolo completo en la sección de Hidratación.')
+]},
+{id:'timing', num:4, title:'Timing Nutricional', blocks:[
+  p('¿Cuándo entrenás? Organizá tu día desde ahí. El timing no cambia qué comés — cambia cuándo lo comés. Y en el contexto deportivo, ese detalle hace una diferencia real en rendimiento, recuperación y composición corporal.'),
+  ul([
+    '🌅 Entrenás a la mañana temprano (6–8hs)',
+    '🌄 Entrenás a la mañana (9–11hs)',
+    '☀️ Entrenás al mediodía (12–14hs)',
+    '🌆 Entrenás a la tarde temprano (15–17hs)',
+    '🌇 Entrenás a la tarde (17–19hs)',
+    '🌙 Entrenás a la noche (20–22hs)'
+  ]),
+  p('Según tu horario de entrenamiento, tu día se organiza de una forma u otra. Encontrá tu caso y usalo como referencia para estructurar tus comidas.'),
+  xlink('Abrí tu Timing correspondiente','https://timings-nutricionales.vercel.app/'),
+  h3('Algunas aclaraciones importantes','⚠️'),
+  ul([
+    'Entrenamiento en ayunas (mañana muy temprana): válido si lo tolerás y lo venís haciendo. Lo innegociable es el post-entrenamiento — comer dentro de los 60 minutos siguientes es aún más prioritario acá.',
+    '¿Y si entrenás más de 90 min en cualquier horario? Sumale la estrategia intra-entrenamiento, independientemente del horario. Si incorporás hidratos intra, esos hidratos se reducen en la siguiente ingesta.',
+    'Comida antes de dormir: si el post-entreno queda cerca de la hora de sueño (menos de 1-2hs), priorizá proteína de buena digestión y reducí grasas. Los HC simples siguen siendo útiles para reponer glucógeno incluso de noche.'
+  ])
+]},
+{id:'prot-cho', num:5, title:'Proteínas y Carbohidratos', blocks:[
+  p('En la nutrición deportiva no existe un macronutriente más importante que otro. Los hidratos de carbono y las proteínas cumplen funciones completamente diferentes y se necesitan mutuamente para que el plan funcione.'),
+  h3('Carbohidratos — los reyes de la energía y el rendimiento','🍞'),
+  p('Son el combustible preferido por el músculo y el sistema nervioso central durante el ejercicio. Su reserva en el cuerpo (glucógeno muscular y hepático) es limitada y puede agotarse en 1 a 2 horas de ejercicio intenso. Antes y durante el entrenamiento: los carbohidratos mandan.'),
+  h3('Proteínas — los ladrillos de la estructura y la recuperación','💪'),
+  p('Su función principal no es dar energía sino cumplir un rol plástico y estructural: reparar fibras musculares, sintetizar nuevas proteínas contráctiles y favorecer las adaptaciones. Si el glucógeno está bajo, el cuerpo recurre a degradar proteína muscular — eso es catabolismo. Después del entrenamiento: las proteínas toman el rol principal.'),
+  h3('La sinergia que hace funcionar todo',''),
+  p('En el post-entrenamiento, consumir carbohidratos y proteínas juntos genera un efecto mayor que cada uno por separado: los carbohidratos estimulan la insulina, que acelera la resíntesis de glucógeno y favorece la captación de aminoácidos. No compiten — se potencian.'),
+  h3('Fuentes proteicas que priorizamos',''),
+  ul([
+    'Completas y de alta calidad: carnes magras, pescados blancos y azules, huevo entero y clara, lácteos altos en proteína.',
+    'Buenas fuentes complementarias: legumbres, quínoa, tofu, tempeh — también aportan carbohidratos.',
+    'Aporte moderado: avena, pan integral, frutos secos y semillas.'
+  ]),
+  p('¿Suplementación? No es obligatoria, pero es útil cuando el horario o el estilo de vida dificultan llegar al aporte proteico solo con alimentos. Whey (absorción rápida, post-entreno) o caseína (absorción lenta, antes de dormir). La suplementación complementa — no reemplaza — una alimentación bien estructurada.'),
+  xlink('Guía de Suplementos NFU','https://drive.google.com/file/d/1jaW8AJ5cDJ54byF5B6Q1WJXRG6Tc1O7e/view')
+]},
+{id:'hidratacion', num:6, title:'Hidratación', blocks:[
+  p('Una deshidratación de apenas el 2% del peso corporal ya es suficiente para afectar la fuerza, la resistencia, la concentración y la toma de decisiones durante el esfuerzo.'),
+  h3('Antes del entrenamiento','💧'),
+  p('Referencia simple: tu peso al despertar en ayunas no debería variar más del 1% respecto al día anterior, y tu orina debería ser amarillo pálido a transparente.'),
+  ul([
+    '2 a 4 horas antes: 5-10 ml de líquido por kg de peso corporal.',
+    'Si la orina sigue oscura 2 horas antes: sumá 3-5 ml/kg adicionales.',
+    'Clima caluroso/húmedo: agregá 300-400 ml extra 15-20 min antes de arrancar.'
+  ]),
+  h3('Durante el entrenamiento','💧'),
+  p('150-350 ml cada 15-20 minutos, sin esperar a tener sed.'),
+  ul([
+    'Menos de 60 min: agua sola o isotónica sin azúcar (zero).',
+    '60 a 90 min: isotónica CON hidratos, ~500 ml por hora.',
+    'Más de 90 min: isotónica con hidratos, ~1 litro por hora, o la receta casera de la sección de sesiones largas.'
+  ]),
+  h3('Después del entrenamiento (recuperación)','💧'),
+  p('Reponer el 150% del peso perdido durante las primeras 6 horas post-ejercicio (perdés 1 kg → tomá ~1,5 litros), de forma espaciada y con electrolitos, no de golpe. El sodio es clave para retener el líquido ingerido.'),
+  h3('Qué tomar y qué evitar','🥤'),
+  ul([
+    '✅ Agua, aguas saborizadas sin azúcar, infusiones sin azúcar (mate, té, café), isotónica zero (<60min) o con HC (>60min), bebida casera (>90min), leche/chocolatada descremada post-entreno.',
+    '❌ Bebidas azucaradas y jugos industriales fuera de contexto deportivo, alcohol (deshidrata).',
+    'Energizantes: no hidratan bien, pero pueden ser un salvavidas puntual pre-entreno (versión Zero si comiste bien; con azúcar si estás en ayunas) — usalas solo como excepción.'
+  ])
+]},
+{id:'habitos', num:7, title:'Hábitos a Implementar', blocks:[
+  p('El objetivo es incorporar hábitos clave que permitan optimizar el funcionamiento del cuerpo, el rendimiento diario y la sostenibilidad del proceso en el tiempo. No se trata de perfección, sino de consistencia.'),
+  h3('Romper el ayuno estratégicamente','🔁'),
+  p('Si ese día entrenás: proteínas + carbohidratos de moderado índice glucémico. Si es día de descanso: proteínas y grasas saludables. En ambos casos, evitá arrancar con azúcares simples o harinas refinadas.'),
+  h3('Regularidad en los horarios de comida','🔁'),
+  p('Comer en horarios similares todos los días tiene impacto fisiológico real: cuando los horarios son predecibles, la respuesta hormonal, el rendimiento y la tolerancia digestiva mejoran.'),
+  h3('Cena según el contexto del día','🔁'),
+  p('Si entrenaste tarde/noche: proteína completa + carbohidratos para reponer glucógeno + poca grasa. Si fue día de descanso o entreno matutino: cena más liviana. Siempre al menos 1,5 a 2 horas antes de dormir.'),
+  h3('Descanso — donde ocurre la adaptación real','🔁'),
+  p('El entrenamiento es el estímulo, el sueño es donde el cuerpo responde. Durante el sueño profundo se libera hormona de crecimiento, se regula la testosterona y se reparan las fibras musculares. Apuntá a un mínimo de 8 horas de sueño de calidad, con horario regular.'),
+  h3('Estructura alimentaria para acompañar el deporte','🔁'),
+  p('Las colaciones no son opcionales, son estratégicas. Organizá tu día en 4 comidas principales + tomas asociadas al entrenamiento. No dejes pasar más de 4-5 horas entre comidas principales. Orden sugerido: vegetales y proteína primero, luego carbohidratos y grasas.'),
+  h3('Evitar FODMAPs cerca del entrenamiento','🔁'),
+  p('Los alimentos ricos en carbohidratos fermentables pueden generar hinchazón y malestar digestivo, especialmente problemático en las horas previas al entrenamiento. No se trata de eliminarlos, sino de ser estratégico con el momento.'),
+  h3('Incluir alimentos antiinflamatorios','🔁'),
+  p('Omega-3 (pescados grasos, chía, lino, nueces), compuestos fenólicos y azufrados (brócoli, rúcula, cebolla, ajo, arándanos, frutillas, uvas moradas), antiinflamatorios directos (cúrcuma, jengibre).'),
+  h3('Incluir alimentos vasodilatadores','🔁'),
+  p('Remolacha, jugo de remolacha, rúcula, espinaca, acelga, lechuga, sandía, pepino — mejoran la perfusión sanguínea y la llegada de nutrientes al músculo.'),
+  h3('Incluir alimentos termogénicos','🔁'),
+  p('La cafeína (incluye mateína) es el termogénico dietario por excelencia y mejora el rendimiento directamente. Capsaicina, piperina y gingeroles comparten efecto termogénico.'),
+  h3('Registro consciente','🔁'),
+  p('No desde la obsesión, sino desde la atención: cómo te sentís antes y después de comer, cómo rinde tu cuerpo según lo que comiste. Ese feedback es información valiosa que ningún número te va a dar.'),
+  h3('No comer hasta llenarte','🔁'),
+  p('Terminá cada comida sintiéndote liviano. Comer lento, sin distracciones y con atención permite registrar la saciedad real antes de llegar al exceso.'),
+  h3('Preparaciones caseras sobre industriales','🔁'),
+  p('Controlá calidad y cantidades. Horno, plancha o salteado con mínimo aceite. Especias, hierbas, limón, vinagre para dar sabor sin depender de la sal en exceso.'),
+  h3('Estrategias para la ansiedad nocturna','🔁'),
+  p('Infusión digestiva caliente, cepillarte los dientes después de cenar, caminata suave post-cena. Si el hambre nocturna es real y frecuente, revisamos si la distribución de comidas del día está bien armada.'),
+  callout('Constancia > Perfección. El progreso se construye con la repetición sostenida de hábitos correctos.', true)
+]},
+{id:'fodmaps', num:8, title:'FODMAPs — Consideraciones', blocks:[
+  p('Oligosacáridos, disacáridos, monosacáridos y polioles fermentables (lactosa, gluten, azúcar, alcohol) son alimentos que absorbiéndose lentamente contribuyen a la fermentación intestinal. Aunque no son "malos" en sí, pueden ser contraproducentes para tu rendimiento si tenés sensibilidad intestinal o simplemente te inflaman.'),
+  h3('¿Qué puede pasar si comés FODMAPs antes de entrenar?',''),
+  ul([
+    'Hinchazón y gases.',
+    'Pesadez abdominal que interfiere con la movilidad y el foco mental.',
+    'Fatiga temprana durante el entrenamiento.',
+    'En algunos casos, urgencia intestinal o malestar general.'
+  ]),
+  p('¿Qué hacemos en el plan? Las comidas previas al entrenamiento están diseñadas para ser bajas en FODMAPs y de fácil digestión. Las legumbres, por ejemplo, van mejor en el almuerzo de un día de descanso que en la comida previa a una sesión intensa.'),
+  h3('¿Cómo contrarrestar los efectos negativos?',''),
+  ul([
+    'Fibra: contribuye al gas, pero reduce riesgo de cáncer colorrectal, alimenta la microbiota y refuerza el sistema inmune — la incorporamos de forma controlada.',
+    'Probióticos: refuerzan la microbiota intestinal.',
+    'Omega-3: ácido graso esencial antiinflamatorio.'
+  ])
+]},
+{id:'ayuno', num:9, title:'Ayuno, ¿Cuándo Suma y Cuándo No?', blocks:[
+  p('El ayuno intermitente alterna períodos de ingesta con períodos sin consumir alimentos (ej: protocolo 16:8). Durante el ayuno el cuerpo disminuye la liberación de insulina, promoviendo el uso de grasas como fuente de energía.'),
+  callout('No es obligatorio ayunar para obtener resultados, pero puede ser una excelente herramienta si se adapta a tu estilo de vida y rutina de entrenamiento.'),
+  h3('¿Cuándo puede ser compatible?',''),
+  ul([
+    'Cuando entrenás a la tarde/noche y podés ubicar toda la alimentación alrededor del esfuerzo.',
+    'En días de descanso o entrenamiento de baja intensidad.',
+    'En etapas de recomposición corporal.',
+    'Cuando ya tenés una buena base de alimentación y buscás una herramienta adicional de gestión calórica.'
+  ]),
+  h3('¿Cuándo puede ser contraproducente?',''),
+  ul([
+    'Si entrenás a la mañana temprano con alta intensidad o volumen.',
+    'Si tu volumen de entrenamiento semanal es alto.',
+    'Ventanas de alimentación muy cortas que dificultan cubrir el requerimiento proteico.',
+    'Si genera ansiedad, atracones o una relación poco saludable con la comida — no vale la pena.'
+  ]),
+  h3('Cómo romper el ayuno según el contexto',''),
+  p('Si entrenás poco después: carbohidratos de moderado IG + proteína. Si rompés el ayuno lejos del entrenamiento o en descanso: proteínas y grasas saludables primero, carbohidratos complejos después.'),
+  p('Una forma simple y sostenible de comenzar es con un ayuno de 12 horas (desde la cena hasta media mañana), ya que la mayor parte del tiempo se pasa durmiendo. Podés extenderlo con café negro, té sin azúcar o mate amargo.')
+]},
+{id:'no-tan-fit', num:10, title:'Alimentos "No tan Fit"', blocks:[
+  p('Una buena alimentación no tiene por qué ser perfecta todos los días, sino estratégica y sostenida en el tiempo. Incluir de manera ocasional y medida alimentos como alfajores, helados, chocolates o golosinas es posible y saludable desde el punto de vista emocional y conductual. Estos pueden formar parte en un 10-20% de tus decisiones.'),
+  h3('Frecuencia',''),
+  p('Entre 2 y 4 veces por semana, dependiendo de tus objetivos, nivel de entrenamiento y balance energético. No hace falta "esperar al fin de semana" — incluirlos durante la semana rompe con la mentalidad de "prohibido/permitido".'),
+  h3('Horarios recomendados',''),
+  ul([
+    'Post entrenamiento: el mejor momento — tu cuerpo está más receptivo al uso de carbohidratos y los "permitidos" se usan eficientemente sin acumularse como grasa.',
+    'Media mañana o merienda: siempre acompañados de proteína (yogur, huevos, queso) y/o grasas saludables, para bajar la velocidad de absorción.'
+  ]),
+  h3('Estrategia y conciencia',''),
+  p('Evitalos en momentos de mucha hambre o ansiedad. No los comas con culpa: lo importante es que sea parte de un plan, no un "escape". Si sabés que vas a querer algo específico esa semana, planificalo.'),
+  p('En la mayoría de los casos, una porción puntual dentro de un proceso bien sostenido no requiere ningún ajuste — el impacto aislado es mínimo.')
+]},
+{id:'alcohol', num:11, title:'Alcohol', blocks:[
+  p('¿Se puede tomar y aún así tener resultados? Sí. El consumo ocasional y consciente de alcohol puede tener lugar dentro del plan, siempre que se maneje con criterio.'),
+  h3('Consecuencias del exceso',''),
+  ul([
+    'Inhibe la síntesis proteica muscular hasta 24 horas después de su consumo.',
+    'Compromete la recuperación: interfiere con la reposición de glucógeno y la reparación muscular.',
+    'Deshidrata: actúa como diurético.',
+    'Afecta la calidad del sueño profundo, justo cuando se libera hormona de crecimiento.',
+    'Puede disparar el apetito y dificultar las decisiones nutricionales del día siguiente.'
+  ]),
+  h3('Recomendaciones para incluirlo de forma estratégica',''),
+  p('No más de 1 a 2 veces por semana, siempre en moderación (1 copa de vino, 1 vaso de cerveza o 1 trago corto). En comidas principales con proteínas y grasas (ralentiza la absorción), nunca con el estómago vacío, idealmente en días de descanso o entrenamientos livianos.'),
+  h3('Opciones más "amigables"','🍷'),
+  ul([
+    'Vino tinto (1 copa): rico en polifenoles, con moderación.',
+    'Cerveza artesanal suave (1 vaso): menor graduación alcohólica.',
+    'Fernet con coca cero o light (1 vaso).',
+    'Gin con tónica sin azúcar y cítricos (1 vaso).',
+    'Agua saborizada casera con gas, hielo y frutas: para "simular" una bebida sin alcohol.'
+  ])
+]},
+{id:'seleccion', num:12, title:'Selección y Formas de Preparación', blocks:[
+  h3('Preparaciones saladas dietéticas o modificadas',''),
+  ul([
+    'Aceite crudo al final de la cocción; aceite en lugar de manteca o crema.',
+    'Agua para salteados, o aceite en spray / oliva extra virgen. Spray para untar asaderas.',
+    'Carnes sobre colchón de vegetales para evitar aceite y realzar sabor. Papel aluminio para conservar jugos.',
+    'Cortes de carne magros, retirar grasa visible y piel del pollo. Lácteos descremados.',
+    'Ampliar el uso de condimentos. Evitar frituras. Harinas integrales cuando sea posible.',
+    'Frutas y vegetales crudos, con cáscara, bien lavados. Vegetales que necesiten cocción: dejarles la cáscara por su aporte de fibra.'
+  ]),
+  h3('Preparaciones dietéticas o modificadas dulces',''),
+  ul([
+    'Edulcorante. Lácteos descremados.',
+    'Esencia de vainilla, canela, menta, anís estrellado, ralladura de cítricos.'
+  ]),
+  p('Para evitar repeticiones, el detalle completo de porciones, equivalencias e intercambios entre alimentos se desarrolla en el archivo específico Sistema de Porciones de Intercambio.'),
+  xlink('Sistema de Porciones de Intercambio','#', false)
+]},
+{id:'marcas', num:13, title:'Marcas para Facilitar la Elección', blocks:[
+  ul([
+    'Queso untable: Tregar blanco light, Finlandia light, García La Serenísima.',
+    'Ricota magra García La Serenísima. Mendicrim cremoso light La Paulina.',
+    'Queso port salut light (magro): Tregar, cuartirolo La Verónica, Ilolay. Queso tybo light La Verónica.',
+    'Yogur: Yogurísimo natural, Yogurísimo griego natural (13g prot con probióticos), Yogurísimo griego endulzado (14g prot con probióticos), Ser pro+, Ser deslactosado, bebible natural La Serenísima.',
+    'Leche La Serenísima: Proteína deslactosada, Calcio deslactosada, Probióticos deslactosada, deslactosada. Leche Tregar deslactosada.',
+    'Chocolatada La Serenísima Proteína 70% reducida en lactosa. Leche en polvo semidescremada/descremada La Serenísima deslactosada.',
+    'Leches y yogures Ilolay. Leche Las Tres Niñas deslactosada. Leches y quesos deslactosados Verónica.',
+    'Mantequilla de maní natural o crunchy: King, Croppers.',
+    'Granolas sin "miel" como primer ingrediente en el rotulado. Cacao amargo puro en polvo: Dicomere, Dr. Cacao.',
+    'Barritas proteicas: Low Carb, Integra, Not Snackbar Protein. Tostadas de arroz: Molinos Ala, Cerealitas.',
+    'Galletitas Cereal Mix sin harinas. Copos de maíz sin azúcar: Kellogg\'s Cornflakes, 3 Arroyos.',
+    'Pan integral 100%, pan de centeno, pan de salvado: Fargo, Pan de Mesa Estilo Artesanal (tipo molde).',
+    'Arvejas secas, lentejas, garbanzos: Arcor, Lucchetti, otras. Carnes: carnicerías propias, Coto, Carrefour.',
+    'Aceites Natura, otras. Yerbas sin palos (marca a elección). Café molido tostado: Martínez, Cruzeiro, Cabrales.',
+    'Stevia: Dulri, Trévor, Jual (evitar las que llevan eritritol, xilitol, sorbitol, aspartamo, acesulfame K, ciclamato). Hileret (stevia + sucralosa + dextrosa) también es opción.',
+    'Salsas Mrs Taste zero calorías (chocolate, caramelo, chocolate con avellanas).'
+  ])
+]},
+{id:'compras', num:14, title:'Ideas de Qué Comprar', blocks:[
+  h3('Frutas frescas','🍎'),
+  p('Manzana verde y/o roja, banana, frutillas, arándanos, sandía, melón, mandarina, naranja, ciruelas, duraznos, uvas, limones, kiwis, pera, palta, ananá, papaya, pomelo.'),
+  h3('Verduras y hortalizas','🥦'),
+  p('Espinaca, acelga, lechuga, rúcula, zapallito, zucchini, berenjena, pimiento rojo/verde, brócoli, cebolla, cebolla de verdeo, ajo, zanahoria, remolacha, tomate perita y cherry, pepino, papa, batata, choclo, ají.'),
+  h3('Lácteos deslactosados y derivados','🥛'),
+  p('Leche deslactosada descremada, yogures naturales sin azúcar, yogur deslactosado con frutas naturales, queso untable alto en proteínas (Tregar light, Finlandia light), quesos magros altos en proteínas y bajos en sodio, manteca de grasa animal (no vegetal, no margarina).'),
+  h3('Cereales, panificados y derivados','🍞'),
+  p('Pan integral o de masa madre (100% harina integral), pan negro/centeno/salvado, harinas integrales, fideos integrales, galletas de arroz integrales, galletitas integrales o con salvado, avena instantánea, quinoa, quinoa pops, granola sin azúcar, cereales sin azúcar agregada, arroz integral, copos de maíz sin azúcar.'),
+  h3('Legumbres y derivados','🫘'),
+  p('Preferir secas para remojar (bajas en sodio): lentejas, garbanzos, hummus natural, porotos negros, arvejas, soja texturizada, tofu, tempeh, harinas de legumbres.'),
+  h3('Carnes y proteínas animales','🍗'),
+  p('Pechugas de pollo, pata-muslo, pollo entero, cortes magros de cerdo (carré, solomillo, lomo, bondiola sin grasa), carne picada magra, cortes magros de vaca (nalga, cuadrada, lomo, bola de lomo, peceto, cuadril, bife angosto), jamón cocido natural sin azúcar ni almidón, huevo.'),
+  h3('Pescados azules (grasos + Omega-3)','🐟'),
+  p('Jurel, anchoa, caballa, atún, bonito, salmón, sardinas, trucha (fresco o en lata al agua).'),
+  h3('Pescados blancos (magros)','🐟'),
+  p('Merluza, lenguado, abadejo, corvina.'),
+  h3('Frutos secos y semillas','🥜'),
+  p('Nueces, nueces de pecan, almendras, avellanas, pistachos, maní pelado natural sin sal, castañas de cajú sin sal, piñones, mix de semillas (chía, lino, sésamo, girasol, calabaza, amapola).'),
+  h3('Otros alimentos útiles','🥫'),
+  p('Aceite de oliva extra virgen, aceite de girasol alto oleico, aceite blend, aceite de canola, aceite en spray, mantequilla de maní natural, cacao amargo en polvo, jugo de limón, miel, stevia, sucralosa, salsas zero calorías.'),
+  p('Condimentos — aromáticos: albahaca, azafrán, canela, cardamomo, cilantro, comino, cúrcuma, laurel, nuez moscada, orégano, perejil, romero, mostaza, tomillo, eneldo, clavo de olor, hinojo, menta. Ácidos: limón, vinagreta, aceto balsámico, lima. Picantes: jengibre, wasabi, pimienta, ají molido, pimentón, chile, curry. Aliáceos: cebolla de verdeo, cebolla, ajo, cebollín, echalote, puerro. Salsas caseras: provenzal, chimichurri, escabeche, pesto, salsa criolla, vinagreta.'),
+  p('Té verde/negro/matcha/manzanilla/limón/menta/tilo/jengibre, café molido tostado, yerbas sin/con palo, levadura en polvo, gelatina light, germen de trigo, salvado de avena.')
+]},
+{id:'organizacion', num:15, title:'Organización y Educación Alimentaria', blocks:[
+  h3('Paso 1 — Comenzá a construir tu alimentación',''),
+  p('Armá tu alimentación diaria de forma progresiva, usando este plan como guía. Buscá variedad de alimentos, colores, texturas y sabores, sin necesidad de hacerlo perfecto desde el primer día.'),
+  h3('Paso 2 — Armar lista de compras',''),
+  p('Hacela mirando tres cosas: tu planificación semanal de comidas, la heladera, y la alacena.'),
+  h3('Paso 3 — Estipular un día para ir al súper',''),
+  p('Si siempre te surge la excusa de "no tuve tiempo", estipulá un día fijo — ej: todos los sábados por la mañana.'),
+  h3('Paso 4 — Condición para ir de compras',''),
+  ul([
+    'Evitar ir con mucha hambre — te llenás de tentaciones difíciles de evitar.',
+    'Evitar pasar por góndolas que no suman si no necesitás nada de ahí.',
+    'Prestar atención a la zona de cajas: productos colocados estratégicamente para la compra impulsiva.'
+  ]),
+  h3('Paso 5 — El post-compras: ubicación en heladera y alacena',''),
+  p('Heladera: frutas/verduras lavadas en cajones inferiores; carnes en el estante inferior (más frío, evita contaminación cruzada) en recipientes herméticos; huevos en estantes medios/superiores con la punta hacia abajo; comidas cocidas y lácteos en estantes medios/superiores.'),
+  p('Alacena: papas, cebollas, ajos, calabazas, batatas, paltas inmaduras, bananas y tomates fuera de la heladera. No perecederos: legumbres, cereales, harinas, enlatados, aceites, especias.'),
+  h3('Paso 6 — Anticiparse',''),
+  p('Guardá en la heladera tuppers con arroz integral o legumbres ya cocidas. Cociná porciones de más y guardalas. Si cortás un alimento, cortá de más y freezá para una futura comida.'),
+  h3('Paso 7 — Evitar tener tentaciones',''),
+  p('Evitá comprar "por las dudas" galletitas, snacks, gaseosas, chocolates. En su lugar: frutas, frutos secos, verduras, alimentos naturales.'),
+  h3('Paso 8 — Tener colaciones a mano',''),
+  p('En casa y en tu bolso/mochila, tené colaciones a mano para evitar recurrir a opciones de baja calidad nutricional cuando te agarra el hambre.')
+]}
+];
+
+/* ---------- render ---------- */
+function blockHtml(b){
+  switch(b.t){
+    case 'h2': return `<div class="block-h2">${b.v}</div>`;
+    case 'h3': return `<div class="block-h3">${b.emoji?`<span>${b.emoji}</span>`:''}${b.v}</div>`;
+    case 'p': return `<p class="block-p">${b.v}</p>`;
+    case 'ul': return `<ul class="block-ul">${b.v.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    case 'ol': return `<ol class="block-ol">${b.v.map(i=>`<li>${i}</li>`).join('')}</ol>`;
+    case 'callout': return `<div class="callout${b.strong?' strong':''}">${b.v}</div>`;
+    case 'placeholder': return `<div class="placeholder-box"><b>Pendiente de conectar —</b> ${b.v}</div>`;
+    case 'xlink': {
+      const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 7h6v6M19 7L9 17M6 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg>`;
+      const target = b.external ? ` target="_blank" rel="noopener"` : '';
+      return `<div><a class="xlink" href="${b.href}"${target}>${icon}${b.v}</a></div>`;
+    }
+    default: return '';
+  }
+}
+
+const sectionsEl = document.getElementById('sections');
+const indexEl = document.getElementById('indexCard');
+const drawerEl = document.getElementById('drawerList');
+
+let idxHtml = `<div class="idx-card-title">Índice — tocá lo que quieras leer</div>`;
+let drawerHtml = '';
+
+SECTIONS.forEach(sec=>{
+  const secHtml = document.createElement('section');
+  secHtml.className = 'sec';
+  secHtml.id = sec.id;
+  secHtml.innerHTML = `<div class="block-h2" style="margin-top:0;">${sec.num}. ${sec.title}</div>` + sec.blocks.map(blockHtml).join('');
+  sectionsEl.appendChild(secHtml);
+
+  const rowHtml = `<a class="idx-item" href="#${sec.id}"><span class="idx-num">${sec.num}</span>${sec.title}</a>`;
+  idxHtml += rowHtml;
+  drawerHtml += rowHtml.replace('idx-item', 'idx-item').replace('href=', `onclick="toggleDrawer(false)" href=`);
+});
+
+indexEl.innerHTML = idxHtml;
+drawerEl.innerHTML = drawerHtml;
+
+function toggleDrawer(open){
+  document.getElementById('idxDrawer').classList.toggle('show', open);
+}
+
+/* progress bar across whole doc */
+window.addEventListener('scroll', ()=>{
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max>0 ? (window.scrollY/max)*100 : 0;
+  document.getElementById('progressFill').style.width = pct+'%';
+});
+
+/* best-effort desktop zoom blocking — see note below the code */
+document.addEventListener('wheel', e=>{ if(e.ctrlKey) e.preventDefault(); }, {passive:false});
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && ['+','-','=','0'].includes(e.key)) e.preventDefault();
+});
+document.addEventListener('gesturestart', e=> e.preventDefault());
+</script>
+</body>
+</html>
