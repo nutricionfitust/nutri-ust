@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NutriUst — Nutrición Deportiva (mockup)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+  :root{
+    --blue:#0072FB;
+    --blue-2:#6EA4FB;
+    --blue-3:#99C5FF;
+    --ink-1:#0B1B33;
+    --ink-2:#45557E;
+    --ink-3:#8896B8;
+    --card:#FFFFFF;
+    --line:#E3EAF8;
+    --chip:#EAF2FF;
+    --shadow:rgba(20,60,140,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% -8%, rgba(0,114,251,0.14), transparent 42%),
+      radial-gradient(circle at 108% 18%, rgba(110,164,251,0.18), transparent 40%),
+      radial-gradient(circle at 50% 115%, rgba(153,197,255,0.28), transparent 55%),
+      #FFFFFF;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    color:var(--ink-1);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:28px 14px 60px;
+  }
+  .frame{width:100%;max-width:428px;position:relative;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .greet{font-size:22px;font-weight:700;letter-spacing:-0.01em;color:var(--ink-1);}
+  .greet span{color:var(--blue);}
+  .sub{color:var(--ink-3);font-size:13px;margin-top:4px;}
+  .avatar{
+    width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--blue),var(--blue-2));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;color:#fff;
+    box-shadow:0 8px 18px rgba(0,114,251,0.30);
+    flex-shrink:0;
+  }
+
+  /* ---------- Folder list ---------- */
+  .folder{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:10px;
+    overflow:hidden;
+    box-shadow:0 6px 20px var(--shadow);
+    transition:border-color .2s ease;
+  }
+  .folder.open{border-color:rgba(0,114,251,0.35);}
+  .folder-head{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;position:relative;}
+  .folder-head::before{
+    content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;
+    background:var(--blue);border-radius:0 3px 3px 0;opacity:0;transition:opacity .2s ease;
+  }
+  .folder.open .folder-head::before{opacity:1;}
+  .folder-icon{width:34px;height:34px;border-radius:10px;background:var(--chip);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .folder-icon svg{width:16px;height:16px;}
+  .folder-meta{flex:1;min-width:0;}
+  .folder-name{font-size:15px;font-weight:600;color:var(--ink-1);}
+  .folder-count{font-family:'DM Mono', monospace;font-size:11px;color:var(--ink-3);margin-top:2px;}
+  .chev{color:var(--ink-3);transition:transform .25s ease;flex-shrink:0;}
+  .folder.open .chev{transform:rotate(180deg);color:var(--blue);}
+
+  .resource-list{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .folder.open .resource-list{max-height:600px;}
+  .resource{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 62px;border-top:1px solid var(--line);cursor:pointer;}
+  .resource:hover{background:#F6FAFF;}
+  .resource-dot{width:6px;height:6px;border-radius:50%;background:var(--blue-2);flex-shrink:0;}
+  .resource-title{font-size:13.5px;font-weight:500;color:var(--ink-1);flex:1;}
+  .resource-arrow{color:var(--ink-3);font-size:13px;}
+
+  /* ---------- Reader ---------- */
+  #screen-reader{display:none;position:fixed;inset:0;background:#FFFFFF;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  #screen-reader.show{display:block;}
+  .reader-top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,0.90);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .reader-bar{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;max-width:428px;margin:0 auto;}
+  .back-btn{width:34px;height:34px;border-radius:10px;background:var(--chip);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--blue);cursor:pointer;flex-shrink:0;}
+  .reader-crumb{font-family:'DM Mono', monospace;font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;}
+  .progress-track{height:3px;background:var(--line);max-width:428px;margin:0 auto;}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--blue-2));transition:width .1s linear;}
+  .reader-body{max-width:428px;margin:0 auto;padding:26px 20px 60px;}
+  .reader-eyebrow{display:inline-flex;font-family:'DM Mono', monospace;font-size:10.5px;color:var(--blue);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;}
+  .reader-h1{font-size:24px;font-weight:800;line-height:1.25;letter-spacing:-0.01em;margin:0 0 6px;color:var(--ink-1);}
+  .reader-source{font-size:12px;color:var(--ink-3);margin-bottom:26px;}
+  .block-h2{font-size:17px;font-weight:700;color:var(--blue);margin:28px 0 10px;padding-left:12px;border-left:2px solid var(--blue);}
+  .block-p{font-size:14.5px;line-height:1.7;color:var(--ink-2);margin:0 0 12px;}
+  .block-ul{margin:0 0 14px;padding-left:0;list-style:none;}
+  .block-ul li{font-size:14px;line-height:1.6;color:var(--ink-2);padding:8px 0 8px 22px;position:relative;border-bottom:1px dashed var(--line);}
+  .block-ul li:last-child{border-bottom:none;}
+  .block-ul li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--blue-2);}
+  .callout{background:var(--chip);border-radius:12px;padding:14px 16px;font-size:13.5px;color:var(--ink-1);font-weight:500;line-height:1.6;margin:16px 0;}
+  .xlink{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--chip);color:var(--blue);
+    font-size:13px;font-weight:600;
+    padding:2px 9px;border-radius:8px;
+    border:1px solid rgba(0,114,251,0.25);
+    text-decoration:none;
+  }
+  .xlink svg{width:11px;height:11px;}
+  .teaser{font-size:12.5px;color:var(--ink-3);line-height:1.7;margin-top:6px;}
+  .teaser b{color:var(--ink-2);}
+
+  .fab{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%);
+    width:calc(100% - 40px);max-width:388px;
+    background:var(--blue);color:#fff;border:none;border-radius:14px;
+    padding:15px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 14px 30px rgba(0,114,251,0.32);cursor:pointer;z-index:6;
+  }
+  .fab svg{width:16px;height:16px;}
+
+  /* ---------- IG footer ---------- */
+  .ig-footer{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin-top:24px;padding-top:18px;border-top:1px solid var(--line);
+  }
+  .ig-footer a{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink-2);font-size:13px;font-weight:600;}
+  .ig-icon{width:20px;height:20px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- ============ SCREEN 1 ============ -->
+  <div id="screen-folders">
+    <div class="top">
+      <div>
+        <div class="greet">Hola, <span>Sofía</span></div>
+        <div class="sub">Francisco compartió estos recursos con vos</div>
+      </div>
+      <div class="avatar">SU</div>
+    </div>
+
+    <div class="folder open" data-folder="0">
+      <div class="folder-head" onclick="toggleFolder(0)">
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div class="folder-meta">
+          <div class="folder-name">Nutrición Deportiva</div>
+          <div class="folder-count">1 recurso</div>
+        </div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="resource-list">
+        <div class="resource" onclick="openReader()">
+          <div class="resource-dot"></div>
+          <div class="resource-title">Planificación Nutricional</div>
+          <div class="resource-arrow">→</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="folder" data-folder="1">
+      <div class="folder-head" onclick="toggleFolder(1)">
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div class="folder-meta">
+          <div class="folder-name">Hábitos &amp; Estilo de Vida</div>
+          <div class="folder-count">— pendiente</div>
+        </div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="resource-list"></div>
+    </div>
+
+    <div class="folder" data-folder="2">
+      <div class="folder-head" onclick="toggleFolder(2)">
+        <div class="folder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div class="folder-meta">
+          <div class="folder-name">Guías de Referencia</div>
+          <div class="folder-count">— pendiente</div>
+        </div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="resource-list"></div>
+    </div>
+
+    <div class="ig-footer">
+      <a href="https://www.instagram.com/nutricionfitust" target="_blank" rel="noopener">
+        <svg class="ig-icon" viewBox="0 0 24 24" fill="none" stroke="#0072FB" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="6"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="#0072FB" stroke="none"/></svg>
+        @nutricionfitust
+      </a>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 2: READER ============ -->
+  <div id="screen-reader">
+    <div class="reader-top">
+      <div class="reader-bar">
+        <div class="back-btn" onclick="closeReader()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div class="reader-crumb">Nutrición Deportiva</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="reader-body" id="readerBody">
+      <div class="reader-eyebrow">Nutrición Deportiva</div>
+      <h1 class="reader-h1">Planificación Nutricional</h1>
+      <div class="reader-source">Periodizá tu nutrición, optimizá tu rendimiento y acelerá tu recuperación</div>
+
+      <p class="block-p">Bienvenido a este proceso. En este plan vamos a trabajar con una estructura detallada, pensada para ordenar tu alimentación, reducir variables y llevar tus objetivos con mayor control.</p>
+      <p class="block-p">Mi rol es acompañarte en este camino, brindándote las herramientas necesarias para que puedas ejecutar el plan de forma clara, práctica y sostenible en el tiempo. Vos sos el protagonista, y este esquema está diseñado para ayudarte a avanzar con foco y coherencia.</p>
+
+      <div class="block-h2">Objetivo General</div>
+      <p class="block-p">Optimizar el rendimiento deportivo y la composición corporal mediante una distribución inteligente de macronutrientes a lo largo del día, considerando el nivel de actividad física, los horarios habituales, el momento del entrenamiento y las demandas de energía y recuperación individual.</p>
+
+      <div class="block-h2">Objetivos Específicos</div>
+      <ul class="block-ul">
+        <li>Periodizar el aporte de carbohidratos según la demanda energética real de cada día (entrenamiento vs. descanso), priorizando fuentes y cantidades según el momento del día y la duración del esfuerzo.</li>
+        <li>Sostener o aumentar la masa muscular mediante un aporte proteico adecuado, evaluando su distribución a lo largo del día y priorizando los momentos de mayor impacto.</li>
+        <li>Mejorar la recuperación y la adaptación al entrenamiento a través de una nutrición estratégica que favorezca la reposición de glucógeno, la síntesis proteica y la reducción del daño muscular.</li>
+        <li>Desarrollar hábitos alimentarios sostenibles que acompañen el proceso deportivo a largo plazo, con herramientas concretas para tomar decisiones nutricionales en distintos contextos.</li>
+      </ul>
+
+      <div class="callout">Con el plan no buscamos la perfección, sino precisión con criterio. No existen alimentos prohibidos, pero sí elecciones más alineadas a tus objetivos actuales.</div>
+
+      <div class="block-h2">Bases del Enfoque Nutricional Personalizado</div>
+      <p class="block-p">En función de tus objetivos deportivos y de tu entrenamiento actual, este plan se apoya en principios de nutrición deportiva aplicada, con un enfoque estructurado, preciso y adaptable, diseñado para optimizar el rendimiento, la composición corporal y la recuperación.</p>
+      <p class="block-p">Dentro de este plan vas a encontrar referencias al
+        <a class="xlink" href="#" onclick="event.preventDefault()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 7h6v6M19 7L9 17M6 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg>Sistema de Puntos de Carbohidratos</a>,
+        un archivo complementario donde cada alimento tiene asignado un puntaje. Eso te va a permitir armar tus comidas con criterio, sin contar calorías de forma obsesiva.</p>
+
+      <p class="teaser">↓ el resto del índice sigue con el mismo formato — <b>Periodización Nutricional</b> (día de entreno / descanso / sesiones +90'), <b>Timing</b>, <b>Proteínas y Carbohidratos</b>, <b>Hidratación</b>, <b>Hábitos</b>, <b>FODMAPs</b>, <b>Ayuno</b>, <b>Alimentos "no tan fit"</b>, <b>Alcohol</b>, <b>Selección y Preparación</b>, <b>Marcas</b>, <b>Lista de compras</b>, <b>Organización Alimentaria</b> — cada título del índice real salta directo a su sección, y cada mención a otro archivo tuyo (como <span style="color:var(--blue);font-weight:600;">Guía de Suples</span>) queda como link interno una vez que ese archivo también esté cargado acá.</p>
+    </div>
+
+    <button class="fab" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+      Descargar PDF
+    </button>
+  </div>
+
+</div>
+
+<script>
+function toggleFolder(i){
+  document.querySelectorAll('.folder').forEach(f=>{
+    if(parseInt(f.dataset.folder)!==i) f.classList.remove('open');
+  });
+  document.querySelector('[data-folder="'+i+'"]').classList.toggle('open');
+}
+function openReader(){
+  document.getElementById('screen-reader').classList.add('show');
+  window.scrollTo(0,0);
+}
+function closeReader(){
+  document.getElementById('screen-reader').classList.remove('show');
+}
+document.getElementById('screen-reader').addEventListener('scroll', function(){
+  const el=this;
+  const max=el.scrollHeight-el.clientHeight;
+  const pct=max>0?(el.scrollTop/max)*100:0;
+  document.getElementById('progressFill').style.width=pct+'%';
+});
+</script>
+
+</body>
+</html>
