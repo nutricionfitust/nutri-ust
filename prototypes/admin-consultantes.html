@@ -48,15 +48,53 @@
   .icon-btn{width:30px;height:30px;border-radius:8px;background:var(--chip);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;display:flex;align-items:center;justify-content:center;}
   .empty{color:var(--ink-3);font-size:13px;text-align:center;padding:20px 0;}
   .hint{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.5;}
+  #screen-login{max-width:380px;margin:80px auto 0;}
+  #screen-login .card{margin-bottom:0;}
+  .session-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:12.5px;color:var(--ink-3);}
+  .link-btn{background:none;border:none;color:var(--blue);font-size:12.5px;font-weight:600;cursor:pointer;padding:0;}
+  .link-btn.muted{color:var(--ink-3);}
+  .switch-mode{text-align:center;margin-top:14px;font-size:12.5px;color:var(--ink-3);}
 </style>
 </head>
 <body>
+<div id="screen-login">
+  <div class="wrap" style="padding-top:0;">
+    <div class="top"><div><div class="brand">NutriUst · <span>Panel</span></div></div></div>
+    <div class="card">
+      <h2 id="loginTitle">Ingresar</h2>
+      <div id="loginFields"></div>
+      <button class="btn" id="loginBtn" onclick="handleLoginSubmit()">Entrar</button>
+      <div class="msg" id="msgLogin"></div>
+      <div class="switch-mode" id="switchModeHint" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-panel" style="display:none;">
 <div class="wrap">
+  <div class="session-bar">
+    <span id="sessionWho"></span>
+    <span>
+      <button class="link-btn" onclick="showChangePassword()">Cambiar contraseña</button>
+      &nbsp;·&nbsp;
+      <button class="link-btn muted" onclick="logout()">Salir</button>
+    </span>
+  </div>
   <div class="top">
     <div>
       <div class="brand">NutriUst · <span>Panel</span></div>
       <div class="sub">Alta de consultantes — NutriciónFit UST</div>
     </div>
+  </div>
+
+  <div class="card" id="cardChangePw" style="display:none;">
+    <h2>Cambiar mi contraseña</h2>
+    <label>Contraseña actual</label>
+    <input id="cpActual" type="password">
+    <label>Contraseña nueva</label>
+    <input id="cpNueva" type="password">
+    <button class="btn" onclick="cambiarMiPassword()">Guardar</button>
+    <div class="msg" id="msgChangePw"></div>
   </div>
 
   <div class="card">
@@ -83,6 +121,7 @@
     <div id="lista"><div class="empty">Cargando…</div></div>
   </div>
 </div>
+</div>
 
 <script>
 const SUPABASE_URL = 'https://ebtxzmwsuzzfkamxteyg.supabase.co';
@@ -102,6 +141,110 @@ async function rpc(fn, args){
   const data = await res.json().catch(()=>null);
   if(!res.ok){ throw new Error((data && (data.message || data.hint)) || 'Error de conexión'); }
   return data;
+}
+
+// ---------- Login / primer ingreso ----------
+let modoSetup = false;
+
+function renderLoginFields(){
+  const fields = document.getElementById('loginFields');
+  if(modoSetup){
+    document.getElementById('loginTitle').textContent = 'Configurá tu acceso';
+    fields.innerHTML = `
+      <label>Elegí un usuario</label>
+      <input id="liUsuario" placeholder="ej: francisco">
+      <label>Elegí una contraseña</label>
+      <input id="liPassword" type="password" placeholder="Contraseña">
+    `;
+    document.getElementById('loginBtn').textContent = 'Configurar y entrar';
+    document.getElementById('switchModeHint').style.display = 'none';
+  } else {
+    document.getElementById('loginTitle').textContent = 'Ingresar';
+    fields.innerHTML = `
+      <label>Email o usuario</label>
+      <input id="liIdent" placeholder="nutricionfit.ust@gmail.com">
+      <label>Contraseña</label>
+      <input id="liPassword" type="password" placeholder="Contraseña">
+    `;
+    document.getElementById('loginBtn').textContent = 'Entrar';
+    document.getElementById('switchModeHint').style.display = 'none';
+  }
+}
+
+async function handleLoginSubmit(){
+  const password = document.getElementById('liPassword').value.trim();
+  if(modoSetup){
+    const username = document.getElementById('liUsuario').value.trim();
+    if(!username || !password){ showMsg('msgLogin','Completá usuario y contraseña.', false); return; }
+    try{
+      await rpc('setup_credenciales_admin', { p_username: username, p_password: password });
+      iniciarSesion(username);
+    }catch(e){
+      showMsg('msgLogin', 'No se pudo configurar: ' + e.message, false);
+    }
+  } else {
+    const ident = document.getElementById('liIdent').value.trim();
+    if(!ident || !password){ showMsg('msgLogin','Completá email/usuario y contraseña.', false); return; }
+    try{
+      const rows = await rpc('login_nutricionista', { p_identificador: ident, p_password: password });
+      if(!rows || !rows.length){ showMsg('msgLogin','Email/usuario o contraseña incorrectos.', false); return; }
+      iniciarSesion(rows[0].username || rows[0].email);
+    }catch(e){
+      showMsg('msgLogin', 'Error: ' + e.message, false);
+    }
+  }
+}
+
+function iniciarSesion(who){
+  sessionStorage.setItem('nfu_admin_session', 'true');
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-panel').style.display = 'block';
+  document.getElementById('sessionWho').textContent = 'Conectado como ' + who;
+  cargarLista();
+}
+
+function logout(){
+  sessionStorage.removeItem('nfu_admin_session');
+  document.getElementById('screen-panel').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'block';
+  document.getElementById('liPassword') && (document.getElementById('liPassword').value = '');
+}
+
+function showChangePassword(){
+  document.getElementById('cardChangePw').style.display = 'block';
+  document.getElementById('cardChangePw').scrollIntoView({behavior:'smooth'});
+}
+
+async function cambiarMiPassword(){
+  const ident = document.getElementById('sessionWho').textContent.replace('Conectado como ', '');
+  const actual = document.getElementById('cpActual').value.trim();
+  const nueva = document.getElementById('cpNueva').value.trim();
+  if(!actual || !nueva){ showMsg('msgChangePw','Completá los dos campos.', false); return; }
+  try{
+    const ok = await rpc('cambiar_password_admin', { p_identificador: ident, p_password_actual: actual, p_password_nuevo: nueva });
+    if(ok){
+      showMsg('msgChangePw','Contraseña actualizada.', true);
+      document.getElementById('cpActual').value = '';
+      document.getElementById('cpNueva').value = '';
+    } else {
+      showMsg('msgChangePw','La contraseña actual no coincide.', false);
+    }
+  }catch(e){
+    showMsg('msgChangePw','Error: ' + e.message, false);
+  }
+}
+
+async function initLogin(){
+  try{
+    modoSetup = await rpc('necesita_setup_admin', {});
+  }catch(e){ modoSetup = false; }
+  renderLoginFields();
+  if(sessionStorage.getItem('nfu_admin_session') === 'true' && !modoSetup){
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('screen-panel').style.display = 'block';
+    document.getElementById('sessionWho').textContent = 'Conectado';
+    cargarLista();
+  }
 }
 
 function slugify(s){
@@ -192,7 +335,7 @@ async function cargarLista(){
   }
 }
 
-cargarLista();
+initLogin();
 </script>
 </body>
 </html>
