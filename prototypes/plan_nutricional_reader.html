@@ -88,8 +88,8 @@
   .toast.show{opacity:1;}
 
   /* ===== screen: reader ===== */
-  #screen-reader{display:none; position:fixed; inset:0; background:#FBFDFF; overflow-y:auto; -webkit-overflow-scrolling:touch; z-index:10; scroll-behavior:smooth;}
-  #screen-reader.show{display:block;}
+  #screen-reader{position:fixed; inset:0; background:#FBFDFF; overflow-y:auto; -webkit-overflow-scrolling:touch; z-index:10; scroll-behavior:smooth; opacity:0; transform:translateY(28px); pointer-events:none; transition:opacity .32s ease, transform .38s cubic-bezier(.22,1,.36,1);}
+  #screen-reader.show{opacity:1; transform:translateY(0); pointer-events:auto;}
   .reader-top{position:sticky;top:0;z-index:5;background:rgba(251,253,255,0.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
   .reader-bar{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:14px 18px;}
   .back-btn, .idx-btn{width:36px;height:36px;border-radius:11px;background:var(--chip);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--blue);cursor:pointer;flex-shrink:0;}
@@ -203,10 +203,10 @@
     </div>
     <div class="resource-list">
       <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Guía de Suplementos</div><div class="resource-tag">pronto</div></div>
-      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Guía de Etiquetado Nutricional</div><div class="resource-tag">pronto</div></div>
+      <div class="resource" onclick="window.open('https://nutricionfitust.my.canva.site/gu-a-etiquetado-nutricional-nfu','_blank')"><div class="resource-dot"></div><div class="resource-title">Guía de Etiquetado Nutricional</div><div class="resource-tag">externo ↗</div></div>
       <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Ideas de Comidas Transportables</div><div class="resource-tag">pronto</div></div>
       <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Porciones de Intercambio</div><div class="resource-tag">pronto</div></div>
-      <div class="resource pending" onclick="showToast('Todavía no está cargado')"><div class="resource-dot"></div><div class="resource-title">Sistema de Puntos de Carbohidratos</div><div class="resource-tag">pronto</div></div>
+      <div class="resource" onclick="window.open('https://sistema-de-puntos-hc-nfu.vercel.app/','_blank')"><div class="resource-dot"></div><div class="resource-title">Sistema de Puntos de Carbohidratos</div><div class="resource-tag">externo ↗</div></div>
     </div>
   </div>
 
