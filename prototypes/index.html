@@ -110,7 +110,7 @@ async function handleSubmit(){
   }
 }
 
-document.getElementById('pass').addEventListener('keydown', e=>{ if(e.key==='Enter') handleSubmit(); });
+document.getElementById('loginCard').addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target.tagName==='INPUT'){ e.preventDefault(); handleSubmit(); } });
 
 (async function checkSetup(){
   try{
