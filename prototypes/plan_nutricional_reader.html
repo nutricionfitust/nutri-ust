@@ -137,6 +137,23 @@
   .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;}
   .drawer-head b{font-size:14px;}
   .drawer-close{width:28px;height:28px;border-radius:8px;background:var(--chip);border:none;color:var(--blue);cursor:pointer;}
+
+  :root{ --accent:#0072FB; --accent-wash:rgba(0,114,251,0.10); }
+  body{ transition: background-color .6s ease; }
+  .block-h2{ border-color: var(--accent); color: var(--accent); transition: color .6s ease, border-color .6s ease; }
+  .xlink{ color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); background: var(--accent-wash); transition: color .6s ease, background .6s ease, border-color .6s ease; }
+  .progress-fill{ background: var(--accent) !important; transition: background .6s ease; }
+  .idx-num{ color: var(--accent); transition: color .6s ease; }
+  .back-btn, .idx-btn{ color: var(--accent); transition: color .6s ease; }
+  .chapter-open{
+    text-align:center; padding:60px 20px 36px; margin:0 0 34px;
+    background: linear-gradient(180deg, var(--accent-wash) 0%, transparent 100%);
+    border-radius: 28px; transition: background .6s ease;
+  }
+  .chapter-eyebrow{font-family:'DM Mono', monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:inline-block;transition:color .6s ease;}
+  .chapter-title{font-size:30px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-1);line-height:1.15;max-width:480px;margin:0 auto;}
+  .chapter-rule{width:46px;height:4px;border-radius:4px;background:var(--accent);margin:20px auto 0;transition:background .6s ease;}
+  @media (min-width:900px){ .chapter-title{font-size:42px;max-width:620px;} .chapter-open{padding:80px 20px 46px;} }
 </style>
 </head>
 <body>
@@ -508,24 +525,33 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
+const SECTION_COLORS = ["#0072FB","#5B6EF5","#FF8A3D","#2BB6A3","#FF5A5F","#FFB020","#17A2B8","#22A6D9","#8B5CF6","#6B9B5E","#5C6B8A","#E0518F","#A8385D","#D97845","#4CAF7D"];
+function hexToRgba(hex, a){
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+let sectionObserver = null;
 function openReader(key){
   const r = RESOURCES[key];
   if(!r){ showToast('Todavía no está cargado'); return; }
   document.getElementById('readerCrumb').textContent = r.crumb;
-  document.getElementById('readerEyebrow').textContent = r.eyebrow;
   document.getElementById('readerH1').textContent = r.title;
   document.getElementById('readerSub').textContent = r.sub;
+  document.getElementById('readerEyebrow').style.display = 'none';
 
   let idxHtml = `<div class="idx-card-title">Índice — tocá lo que quieras leer</div>`;
   let drawerHtml = '';
   const sectionsEl = document.getElementById('sections');
   sectionsEl.innerHTML = '';
-  r.sections.forEach(sec=>{
+  r.sections.forEach((sec, i)=>{
+    const color = SECTION_COLORS[i % SECTION_COLORS.length];
     const secEl = document.createElement('section');
-    secEl.className='sec'; secEl.id=sec.id;
-    secEl.innerHTML = `<div class="block-h2" style="margin-top:0;">${sec.num}. ${sec.title}</div>` + sec.blocks.map(blockHtml).join('');
+    secEl.className='sec'; secEl.id=sec.id; secEl.dataset.color=color;
+    const opener = `<div class="chapter-open"><span class="chapter-eyebrow">${r.crumb}</span><div class="chapter-title">${sec.title}</div><div class="chapter-rule"></div></div>`;
+    secEl.innerHTML = opener + sec.blocks.map(blockHtml).join('');
     sectionsEl.appendChild(secEl);
-    const row = `<a class="idx-item" href="#${sec.id}"><span class="idx-num">${sec.num}</span>${sec.title}</a>`;
+    const row = `<a class="idx-item" href="#${sec.id}"><span class="idx-num" style="color:${color}">●</span>${sec.title}</a>`;
     idxHtml += row;
     drawerHtml += row.replace('href=', `onclick="toggleDrawer(false)" href=`);
   });
@@ -534,6 +560,18 @@ function openReader(key){
 
   document.getElementById('screen-reader').classList.add('show');
   document.getElementById('screen-reader').scrollTop = 0;
+
+  if(sectionObserver) sectionObserver.disconnect();
+  sectionObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const color = entry.target.dataset.color;
+        document.documentElement.style.setProperty('--accent', color);
+        document.documentElement.style.setProperty('--accent-wash', hexToRgba(color, 0.10));
+      }
+    });
+  }, { root: document.getElementById('screen-reader'), rootMargin: '-42% 0px -42% 0px', threshold: 0 });
+  document.querySelectorAll('#sections .sec').forEach(el=>sectionObserver.observe(el));
 }
 function closeReader(){ document.getElementById('screen-reader').classList.remove('show'); }
 function toggleDrawer(open){ document.getElementById('idxDrawer').classList.toggle('show', open); }
