@@ -235,13 +235,16 @@
 
 <div class="modal-bg" id="modalEditar">
   <div class="modal-card">
-    <h2 style="margin:0 0 16px;font-size:15px;">Editar consultante</h2>
+    <h2 style="margin:0 0 4px;font-size:15px;">Info del consultante</h2>
+    <div class="cd-hint" id="eDesdeInfo" style="margin-bottom:16px;">—</div>
     <label>Nombre</label>
     <input id="eNombre">
     <label>Nombre para el saludo</label>
     <input id="eNombreDisplay">
     <label>Usuario</label>
     <input id="eUsuario">
+    <label>Contraseña</label>
+    <input id="ePassword">
     <label>Fecha de nacimiento</label>
     <input id="eFechaNac" type="date">
     <label>Sexo</label>
@@ -314,6 +317,7 @@ async function cambiarMiPassword(){
       showMsg('msgChangePw','Contraseña actualizada.', true);
       document.getElementById('cpActual').value = '';
       document.getElementById('cpNueva').value = '';
+      setTimeout(cerrarCambiarPassword, 700);
     } else {
       showMsg('msgChangePw','La contraseña actual no coincide.', false);
     }
@@ -458,8 +462,6 @@ async function cambiarPassword(id, nombre){
   const nueva = prompt(`Nueva contraseña para ${nombre}:`);
   if(!nueva) return;
   await rpc('admin_set_password_consultante', { p_id: id, p_password: nueva.trim() });
-  const chip = document.getElementById('pass-'+id);
-  if(chip) chip.textContent = nueva.trim();
 }
 
 function renderConsultante(c){
@@ -470,19 +472,19 @@ function renderConsultante(c){
   <div class="consultante" data-id="${c.id}">
     <div class="c-info">
       <div class="c-nombre" onclick="toggleDetalle('${c.id}')">${c.nombre}<svg class="c-chev" id="chev-${c.id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
-      <div class="c-user">@${c.username || '—'} · desde ${fecha}</div>
-      <div class="c-pass" id="pass-${c.id}">${c.password || '—'}</div>
     </div>
     <div class="c-estado ${c.estado}" id="estado-${c.id}">${c.estado}</div>
     <div class="c-actions">
-      <button class="icon-btn" title="Editar" onclick="abrirEditar('${c.id}')">✏️</button>
-      <button class="icon-btn" title="Cambiar contraseña" onclick="cambiarPassword('${c.id}','${c.nombre.replace(/'/g,"")}')">🔑</button>
+      <button class="icon-btn" title="Info y editar" onclick="abrirInfoPopup('${c.id}')">➕</button>
       <button class="icon-btn" title="Activar/Desactivar" onclick="toggleEstado('${c.id}','${c.estado}')">⏻</button>
       <button class="icon-btn danger" title="Eliminar" onclick="eliminarConsultante('${c.id}','${c.nombre.replace(/'/g,"")}')">🗑️</button>
     </div>
   </div>
   <div class="c-detalle" id="detalle-${c.id}">
     <div class="cd-inner">
+      <div class="cd-section" style="padding-top:0;">
+        <div class="cd-hint" id="userinfo-${c.id}">@${c.username || '—'} · desde ${fecha}</div>
+      </div>
       <div class="cd-section">
         <div class="cd-label">Plan nutricional</div>
         <div class="cd-actions" id="plan-actions-${c.id}"><span class="cd-hint">Cargando…</span></div>
@@ -529,13 +531,16 @@ async function planEliminar(consultanteId, recursoId){
   alert('Falta conectar esto a la estructura final del plan.');
 }
 
-function abrirEditar(id){
+function abrirInfoPopup(id){
   const c = window.CONSULTANTES_MAP[id];
   if(!c) return;
+  const fecha = new Date(c.created_at).toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'2-digit'});
   document.getElementById('modalEditar').dataset.id = id;
+  document.getElementById('eDesdeInfo').textContent = `Consultante desde ${fecha}`;
   document.getElementById('eNombre').value = c.nombre || '';
   document.getElementById('eNombreDisplay').value = c.nombre_display || '';
   document.getElementById('eUsuario').value = c.username || '';
+  document.getElementById('ePassword').value = c.password || '';
   document.getElementById('eFechaNac').value = c.fecha_nacimiento || '';
   document.getElementById('eSexo').value = c.sexo || '';
   document.getElementById('eActividad').value = c.actividad_fisica || '';
@@ -550,23 +555,24 @@ async function guardarEdicion(){
   const nombre = document.getElementById('eNombre').value.trim();
   const nombreDisplay = document.getElementById('eNombreDisplay').value.trim();
   const username = document.getElementById('eUsuario').value.trim();
+  const password = document.getElementById('ePassword').value.trim();
   const fecha = document.getElementById('eFechaNac').value || null;
   const sexo = document.getElementById('eSexo').value || null;
   const actividad = document.getElementById('eActividad').value || null;
-  if(!nombre || !username){ showMsg('msgEditar','Completá nombre y usuario.', false); return; }
+  if(!nombre || !username || !password){ showMsg('msgEditar','Completá nombre, usuario y contraseña.', false); return; }
   try{
     await rpc('admin_editar_consultante', {
       p_id: id, p_nombre: nombre, p_username: username,
       p_fecha_nacimiento: fecha, p_sexo: sexo, p_actividad_fisica: actividad,
-      p_nombre_display: nombreDisplay || null
+      p_nombre_display: nombreDisplay || null, p_password: password
     });
     const c = window.CONSULTANTES_MAP[id];
-    c.nombre = nombre; c.nombre_display = nombreDisplay || nombre.split(' ')[0]; c.username = username; c.fecha_nacimiento = fecha; c.sexo = sexo; c.actividad_fisica = actividad;
-    document.querySelector(`.consultante[data-id="${id}"] .c-nombre`).innerHTML = `${nombre}<svg class="c-chev" id="chev-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
-    document.querySelector(`.consultante[data-id="${id}"] .c-nombre`).setAttribute('onclick', `toggleDetalle('${id}')`);
-    const userEl = document.querySelector(`.consultante[data-id="${id}"] .c-user`);
-    const fechaTxt = userEl.textContent.split('·')[1] ? '·' + userEl.textContent.split('·')[1] : '';
-    userEl.textContent = `@${username} ${fechaTxt}`;
+    c.nombre = nombre; c.nombre_display = nombreDisplay || nombre.split(' ')[0]; c.username = username; c.password = password; c.fecha_nacimiento = fecha; c.sexo = sexo; c.actividad_fisica = actividad;
+    const nombreEl = document.querySelector(`.consultante[data-id="${id}"] .c-nombre`);
+    nombreEl.innerHTML = `${nombre}<svg class="c-chev" id="chev-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
+    nombreEl.setAttribute('onclick', `toggleDetalle('${id}')`);
+    const fecha_c = new Date(c.created_at).toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'2-digit'});
+    document.getElementById('userinfo-'+id).textContent = `@${username} · desde ${fecha_c}`;
     cerrarEditar();
   }catch(e){
     const dup = /duplicate|unique/i.test(e.message);
@@ -612,6 +618,10 @@ async function cargarContenido(){
         ? carpeta.items.map(it=>{
             const who = it.consultante_id ? it.consultante_nombre : 'compartido';
             const cls = it.activo ? '' : ' pending';
+            const contenido = it.contenido || {};
+            if(contenido.tipo === 'externo'){
+              return `<a class="resource" href="${contenido.url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="resource-dot"></div><div class="resource-title">${it.titulo}</div><div class="resource-tag">${who}</div></a>`;
+            }
             return `<div class="resource${cls}" onclick="abrirPreview('${it.recurso_id}')"><div class="resource-dot"></div><div class="resource-title">${it.titulo}</div><div class="resource-tag">${who}</div></div>`;
           }).join('')
         : `<div class="resource" style="cursor:default;padding-left:16px;color:var(--ink-3)">Sin recursos todavía</div>`;
