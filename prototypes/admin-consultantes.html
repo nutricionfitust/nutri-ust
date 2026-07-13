@@ -129,6 +129,9 @@
   .crear-body.open{max-height:700px;}
   #consultantesBody.open{max-height:3000px;}
   .crear-body-inner{padding-top:16px;}
+  .pw-card{position:relative; max-height:0; opacity:0; overflow:hidden; padding-top:0; padding-bottom:0; margin-bottom:0; border-width:0; transition:max-height .32s ease, opacity .28s ease, padding .32s ease, margin .32s ease, border-width .32s ease;}
+  .pw-card.show{max-height:420px; opacity:1; padding-top:20px; padding-bottom:20px; margin-bottom:20px; border-width:1px;}
+  .pw-close{position:absolute; top:14px; right:14px; width:26px; height:26px; border-radius:8px; background:var(--chip); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-2); font-size:12px; line-height:1; padding:0;}
 </style>
 </head>
 <body>
@@ -156,7 +159,8 @@
     </div>
   </div>
 
-  <div class="card" id="cardChangePw" style="display:none;">
+  <div class="card pw-card" id="cardChangePw">
+    <button class="pw-close" onclick="cerrarCambiarPassword()">✕</button>
     <h2>Cambiar mi contraseña</h2>
     <label>Contraseña actual</label>
     <input id="cpActual" type="password">
@@ -210,12 +214,12 @@
   </div>
 
   <div class="card">
-    <div class="list-head crear-head open" id="consultantesHead" onclick="toggleConsultantes()">
+    <div class="list-head crear-head" id="consultantesHead" onclick="toggleConsultantes()">
       <h2 style="margin:0">Consultantes</h2>
       <span class="list-count" id="listCount">—</span>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     </div>
-    <div class="crear-body open" id="consultantesBody">
+    <div class="crear-body" id="consultantesBody">
       <div class="crear-body-inner" id="lista"><div class="empty">Cargando…</div></div>
     </div>
   </div>
@@ -227,7 +231,6 @@
 </div>
 </div>
 
-<div class="preview-back" id="previewBack" onclick="cerrarPreview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
 <div id="previewOverlay"><iframe id="previewIframe" src=""></iframe></div>
 
 <div class="modal-bg" id="modalEditar">
@@ -290,8 +293,14 @@ function logout(){
 }
 
 function showChangePassword(){
-  document.getElementById('cardChangePw').style.display = 'block';
-  document.getElementById('cardChangePw').scrollIntoView({behavior:'smooth'});
+  document.getElementById('cardChangePw').classList.add('show');
+  document.getElementById('cardChangePw').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function cerrarCambiarPassword(){
+  document.getElementById('cardChangePw').classList.remove('show');
+  document.getElementById('cpActual').value = '';
+  document.getElementById('cpNueva').value = '';
+  document.getElementById('msgChangePw').className = 'msg';
 }
 
 async function cambiarMiPassword(){
@@ -624,13 +633,14 @@ async function cargarContenido(){
 function abrirPreview(recursoId){
   document.getElementById('previewIframe').src = 'plan_nutricional_reader.html?open=' + recursoId;
   document.getElementById('previewOverlay').classList.add('show');
-  document.getElementById('previewBack').classList.add('show');
 }
 function cerrarPreview(){
   document.getElementById('previewOverlay').classList.remove('show');
-  document.getElementById('previewBack').classList.remove('show');
   document.getElementById('previewIframe').src = '';
 }
+window.addEventListener('message', function(e){
+  if(e.data === 'nfu_cerrar_preview') cerrarPreview();
+});
 
 function enterSubmits(containerId, callback){
   const el = document.getElementById(containerId);
