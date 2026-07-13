@@ -174,7 +174,9 @@
     <div class="crear-body" id="crearBody">
       <div class="crear-body-inner">
         <label>Nombre</label>
-        <input id="fNombre" placeholder="Ej: Sofía Fernández" oninput="sugerirUsuario()">
+        <input id="fNombre" placeholder="Ej: Sofía Fernández" oninput="sugerirUsuario(); sugerirNombreDisplay();">
+        <label>Nombre para el saludo (ej: "Juan José" si es compuesto)</label>
+        <input id="fNombreDisplay" placeholder="Se completa solo, podés cambiarlo" oninput="this.dataset.tocado='true'">
         <label>Usuario</label>
         <input id="fUsuario" placeholder="ej: sofia.fernandez">
         <label>Contraseña</label>
@@ -233,6 +235,8 @@
     <h2 style="margin:0 0 16px;font-size:15px;">Editar consultante</h2>
     <label>Nombre</label>
     <input id="eNombre">
+    <label>Nombre para el saludo</label>
+    <input id="eNombreDisplay">
     <label>Usuario</label>
     <input id="eUsuario">
     <label>Fecha de nacimiento</label>
@@ -336,6 +340,12 @@ function sugerirUsuario(){
   const nombre = document.getElementById('fNombre').value;
   document.getElementById('fUsuario').value = slugify(nombre);
 }
+function sugerirNombreDisplay(){
+  const el = document.getElementById('fNombreDisplay');
+  if(el.dataset.tocado === 'true') return;
+  const nombre = document.getElementById('fNombre').value.trim();
+  el.value = nombre.split(' ')[0] || '';
+}
 function generarPassword(){
   const palabras = ['sol','luna','rio','mar','flor','luz','cielo','verde','azul','fuerte'];
   const p = palabras[Math.floor(Math.random()*palabras.length)] + Math.floor(1000+Math.random()*9000);
@@ -350,6 +360,7 @@ function showMsg(id, text, ok){
 
 async function crearConsultante(){
   const nombre = document.getElementById('fNombre').value.trim();
+  const nombreDisplay = document.getElementById('fNombreDisplay').value.trim();
   const username = document.getElementById('fUsuario').value.trim();
   const password = document.getElementById('fPassword').value.trim();
   const fechaNac = document.getElementById('fFechaNac').value || null;
@@ -367,10 +378,13 @@ async function crearConsultante(){
       p_password: password,
       p_fecha_nacimiento: fechaNac,
       p_sexo: sexo,
-      p_actividad_fisica: actividad
+      p_actividad_fisica: actividad,
+      p_nombre_display: nombreDisplay || null
     });
     document.getElementById('msgCrear').className = 'msg';
     document.getElementById('fNombre').value = '';
+    document.getElementById('fNombreDisplay').value = '';
+    document.getElementById('fNombreDisplay').dataset.tocado = 'false';
     document.getElementById('fUsuario').value = '';
     document.getElementById('fPassword').value = '';
     document.getElementById('fFechaNac').value = '';
@@ -380,7 +394,7 @@ async function crearConsultante(){
     const lista = document.getElementById('lista');
     const emptyEl = lista.querySelector('.empty');
     if(emptyEl) lista.innerHTML = '';
-    const nuevo = { id:newId, nombre, username, password, estado:'activo', created_at:new Date().toISOString(), fecha_nacimiento:fechaNac, sexo, actividad_fisica:actividad };
+    const nuevo = { id:newId, nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, estado:'activo', created_at:new Date().toISOString(), fecha_nacimiento:fechaNac, sexo, actividad_fisica:actividad };
     const wrapper = document.createElement('div');
     wrapper.innerHTML = renderConsultante(nuevo);
     const el = wrapper.firstElementChild;
@@ -511,6 +525,7 @@ function abrirEditar(id){
   if(!c) return;
   document.getElementById('modalEditar').dataset.id = id;
   document.getElementById('eNombre').value = c.nombre || '';
+  document.getElementById('eNombreDisplay').value = c.nombre_display || '';
   document.getElementById('eUsuario').value = c.username || '';
   document.getElementById('eFechaNac').value = c.fecha_nacimiento || '';
   document.getElementById('eSexo').value = c.sexo || '';
@@ -524,6 +539,7 @@ function cerrarEditar(){
 async function guardarEdicion(){
   const id = document.getElementById('modalEditar').dataset.id;
   const nombre = document.getElementById('eNombre').value.trim();
+  const nombreDisplay = document.getElementById('eNombreDisplay').value.trim();
   const username = document.getElementById('eUsuario').value.trim();
   const fecha = document.getElementById('eFechaNac').value || null;
   const sexo = document.getElementById('eSexo').value || null;
@@ -532,10 +548,11 @@ async function guardarEdicion(){
   try{
     await rpc('admin_editar_consultante', {
       p_id: id, p_nombre: nombre, p_username: username,
-      p_fecha_nacimiento: fecha, p_sexo: sexo, p_actividad_fisica: actividad
+      p_fecha_nacimiento: fecha, p_sexo: sexo, p_actividad_fisica: actividad,
+      p_nombre_display: nombreDisplay || null
     });
     const c = window.CONSULTANTES_MAP[id];
-    c.nombre = nombre; c.username = username; c.fecha_nacimiento = fecha; c.sexo = sexo; c.actividad_fisica = actividad;
+    c.nombre = nombre; c.nombre_display = nombreDisplay || nombre.split(' ')[0]; c.username = username; c.fecha_nacimiento = fecha; c.sexo = sexo; c.actividad_fisica = actividad;
     document.querySelector(`.consultante[data-id="${id}"] .c-nombre`).innerHTML = `${nombre}<svg class="c-chev" id="chev-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
     document.querySelector(`.consultante[data-id="${id}"] .c-nombre`).setAttribute('onclick', `toggleDetalle('${id}')`);
     const userEl = document.querySelector(`.consultante[data-id="${id}"] .c-user`);
