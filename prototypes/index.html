@@ -115,7 +115,7 @@ async function handleSubmit(){
     const consultante = await rpc('login_consultante', { p_username: ident, p_password: pass });
     if(consultante && consultante.length){
       localStorage.setItem('nfu_consultante_id', consultante[0].id);
-      localStorage.setItem('nfu_consultante_nombre', consultante[0].nombre);
+      localStorage.setItem('nfu_consultante_nombre', consultante[0].nombre_display || consultante[0].nombre);
       window.location.href = '/prototypes/plan_nutricional_reader.html';
       return;
     }
