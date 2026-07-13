@@ -128,6 +128,7 @@
   .crear-body{max-height:0;overflow:hidden;transition:max-height .32s ease;}
   .crear-body.open{max-height:700px;}
   #consultantesBody.open{max-height:3000px;}
+  #crearBody.open{max-height:3000px;}
   .crear-body-inner{padding-top:16px;}
   .pw-card{position:relative; max-height:0; opacity:0; overflow:hidden; padding-top:0; padding-bottom:0; margin-bottom:0; border-width:0; transition:max-height .32s ease, opacity .28s ease, padding .32s ease, margin .32s ease, border-width .32s ease;}
   .pw-card.show{max-height:420px; opacity:1; padding-top:20px; padding-bottom:20px; margin-bottom:20px; border-width:1px;}
@@ -404,7 +405,7 @@ function sugerirUsuario(){
   document.getElementById('fUsuario').value = slugify(nombre);
 }
 
-const TIPOS_ACTIVIDAD = ['Musculación / Pesas','Cardio (cinta, bici fija, elíptico)','Running / Trote','Ciclismo','Natación','CrossFit / HIIT','Fútbol','Otro deporte de equipo','Yoga / Pilates','Caminata','Otra'];
+const TIPOS_ACTIVIDAD = ['Musculación / Pesas','Fisicoculturismo','Cardio (cinta, bici fija, elíptico)','Running / Trote','Ciclismo','Natación','CrossFit / HIIT','Fútbol','Otro deporte de equipo','Yoga / Pilates','Caminata','Otra'];
 
 function mostrarEdad(inputId, txtId){
   const val = document.getElementById(inputId).value;
@@ -418,24 +419,35 @@ function mostrarEdad(inputId, txtId){
   txtEl.textContent = `— ${edad} años`;
 }
 
-function filaActividadHtml(tipo, tiempo){
-  const opts = TIPOS_ACTIVIDAD.map(t=>`<option value="${t}" ${t===tipo?'selected':''}>${t}</option>`).join('');
-  return `<div class="row actividad-row" style="margin-bottom:8px;">
-    <select class="act-tipo">${opts}</select>
-    <input class="act-tiempo" placeholder="Ej: 60 min, 4 veces/sem" value="${tiempo||''}">
-    <button type="button" class="btn-mini" onclick="this.closest('.actividad-row').remove()">✕</button>
+function filaActividadHtml(tipo, tiempo, otro){
+  const esConocido = TIPOS_ACTIVIDAD.includes(tipo);
+  const tipoReal = esConocido ? tipo : (tipo ? 'Otra' : TIPOS_ACTIVIDAD[0]);
+  const otroReal = esConocido ? (otro||'') : (tipo || otro || '');
+  const opts = TIPOS_ACTIVIDAD.map(t=>`<option value="${t}" ${t===tipoReal?'selected':''}>${t}</option>`).join('');
+  const esOtra = tipoReal === 'Otra';
+  return `<div class="actividad-row" style="border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <select class="act-tipo" style="flex:1;" onchange="this.closest('.actividad-row').querySelector('.act-otro').style.display = (this.value==='Otra') ? 'block' : 'none';">${opts}</select>
+      <button type="button" class="btn-mini" onclick="this.closest('.actividad-row').remove()">✕</button>
+    </div>
+    <input class="act-otro" placeholder="¿Cuál?" value="${otroReal}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;margin-top:8px;display:${esOtra?'block':'none'};">
+    <input class="act-tiempo" placeholder="Horario / frecuencia — ej: 60 min, 4 veces por semana" value="${tiempo||''}" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;margin-top:8px;">
   </div>`;
 }
-function agregarFilaActividad(containerId, tipo, tiempo){
+function agregarFilaActividad(containerId, tipo, tiempo, otro){
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = filaActividadHtml(tipo, tiempo);
+  wrapper.innerHTML = filaActividadHtml(tipo, tiempo, otro);
   document.getElementById(containerId).appendChild(wrapper.firstElementChild);
 }
 function leerActividades(containerId){
-  return Array.from(document.querySelectorAll('#'+containerId+' .actividad-row')).map(row=>({
-    tipo: row.querySelector('.act-tipo').value,
-    tiempo: row.querySelector('.act-tiempo').value.trim()
-  })).filter(a=>a.tiempo);
+  return Array.from(document.querySelectorAll('#'+containerId+' .actividad-row')).map(row=>{
+    const tipoSel = row.querySelector('.act-tipo').value;
+    const otroVal = row.querySelector('.act-otro').value.trim();
+    return {
+      tipo: (tipoSel === 'Otra' && otroVal) ? otroVal : tipoSel,
+      tiempo: row.querySelector('.act-tiempo').value.trim()
+    };
+  }).filter(a=>a.tiempo);
 }
 function sugerirNombreDisplay(){
   const el = document.getElementById('fNombreDisplay');
