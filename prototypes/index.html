@@ -47,17 +47,20 @@
 <div id="bg"><div class="mid"></div></div>
 <div class="card" id="loginCard">
   <div class="brand">Nutri<span>Ust</span></div>
-  <div class="sub" id="cardSub">Ingresá con tu usuario o email</div>
   <div id="normalLogin">
     <label>Usuario o email</label>
-    <input id="ident" placeholder="tu.usuario o email@ejemplo.com" autocomplete="username">
+    <input id="ident" placeholder="usuario o email" autocomplete="username">
     <label>Contraseña</label>
     <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password">
     <button class="btn" id="btnEntrar" onclick="handleSubmit()">Entrar</button>
   </div>
   <div id="setupNotice" style="display:none;">
-    <p style="font-size:13.5px;color:var(--ink-2);line-height:1.5;margin:0 0 4px;">Todavía no configuraste tu acceso de administrador.</p>
-    <a class="btn" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;" href="/prototypes/admin-consultantes.html">Configurar mi acceso</a>
+    <div class="sub" style="margin-bottom:16px;">Primer ingreso — elegí tu acceso</div>
+    <label>Usuario</label>
+    <input id="setupUser" placeholder="ej: francisco" autocomplete="username">
+    <label>Contraseña</label>
+    <input id="setupPass" type="password" placeholder="Contraseña" autocomplete="new-password">
+    <button class="btn" id="btnSetup" onclick="handleSetupSubmit()">Configurar y entrar</button>
   </div>
   <div class="msg" id="msg"></div>
   <div class="spinner" id="spinner">verificando…</div>
@@ -102,6 +105,7 @@ async function handleSubmit(){
     const admin = await rpc('login_nutricionista', { p_identificador: ident, p_password: pass });
     if(admin && admin.length){
       sessionStorage.setItem('nfu_admin_session', 'true');
+      sessionStorage.setItem('nfu_admin_ident', admin[0].username || admin[0].email);
       window.location.href = '/prototypes/admin-consultantes.html';
       return;
     }
@@ -122,13 +126,35 @@ async function handleSubmit(){
   }
 }
 
-document.getElementById('loginCard').addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target.tagName==='INPUT'){ e.preventDefault(); handleSubmit(); } });
+async function handleSetupSubmit(){
+  const username = document.getElementById('setupUser').value.trim();
+  const password = document.getElementById('setupPass').value.trim();
+  document.getElementById('msg').classList.remove('show');
+  if(!username || !password){ showMsg('Completá usuario y contraseña.'); return; }
+  document.getElementById('btnSetup').disabled = true;
+  try{
+    await rpc('setup_credenciales_admin', { p_username: username, p_password: password });
+    sessionStorage.setItem('nfu_admin_session', 'true');
+    sessionStorage.setItem('nfu_admin_ident', username);
+    window.location.href = '/prototypes/admin-consultantes.html';
+  }catch(e){
+    showMsg('Error: ' + e.message);
+    document.getElementById('btnSetup').disabled = false;
+  }
+}
+
+document.getElementById('loginCard').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && e.target.tagName==='INPUT'){
+    e.preventDefault();
+    if(document.getElementById('setupNotice').style.display !== 'none') handleSetupSubmit();
+    else handleSubmit();
+  }
+});
 
 (async function checkSetup(){
   try{
     const needsSetup = await rpc('necesita_setup_admin', {});
     if(needsSetup){
-      document.getElementById('cardSub').textContent = 'Primer ingreso';
       document.getElementById('normalLogin').style.display = 'none';
       document.getElementById('setupNotice').style.display = 'block';
     }
