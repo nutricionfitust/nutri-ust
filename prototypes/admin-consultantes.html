@@ -172,24 +172,25 @@
 
   <div class="card" id="cardCrear">
     <div class="crear-head" id="crearHead" onclick="toggleCrear()">
-      <h2 style="margin:0">Crear consultante</h2>
+      <h2 style="margin:0">Nuevo consultante</h2>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     </div>
     <div class="crear-body" id="crearBody">
       <div class="crear-body-inner">
-        <label>Nombre</label>
+        <label>Tipo de servicio</label>
+        <select id="fTipoServicio">
+          <option value="Deportivo">Nutrición Deportiva</option>
+          <option value="A Punto">Nutrición a Punto</option>
+          <option value="EAN + Hábitos">EAN + Hábitos</option>
+        </select>
+        <label>Nombre y Apellido</label>
         <input id="fNombre" placeholder="Ej: Sofía Fernández" oninput="sugerirUsuario(); sugerirNombreDisplay();">
         <label>Nombre para el saludo (ej: "Juan José" si es compuesto)</label>
         <input id="fNombreDisplay" placeholder="Se completa solo, podés cambiarlo" oninput="this.dataset.tocado='true'">
-        <label>Usuario</label>
-        <input id="fUsuario" placeholder="ej: sofia.fernandez">
-        <label>Contraseña</label>
-        <div class="row">
-          <input id="fPassword" placeholder="Contraseña simple">
-          <button class="btn-mini" onclick="generarPassword()">Generar</button>
-        </div>
-        <label>Fecha de nacimiento</label>
-        <input id="fFechaNac" type="date">
+        <label>DNI / Cédula de Identidad</label>
+        <input id="fDni" placeholder="Ej: 30123456">
+        <label>Fecha de nacimiento <span id="fEdadTxt" style="font-weight:400;color:var(--ink-3);"></span></label>
+        <input id="fFechaNac" type="date" oninput="mostrarEdad('fFechaNac','fEdadTxt')">
         <label>Sexo</label>
         <select id="fSexo">
           <option value="">Sin especificar</option>
@@ -197,15 +198,38 @@
           <option value="M">Masculino</option>
           <option value="Otro">Otro</option>
         </select>
-        <label>Actividad física</label>
-        <select id="fActividad">
+        <label>Talla (cm)</label>
+        <input id="fTalla" type="number" placeholder="Ej: 168">
+        <label>Peso actual (kg)</label>
+        <input id="fPeso" type="number" step="0.1" placeholder="Ej: 68">
+        <label>Número de celular</label>
+        <input id="fCelular" placeholder="Ej: 11 6998-2025">
+        <label>Dirección de email</label>
+        <input id="fEmail" type="email" placeholder="Ej: sofia@mail.com">
+        <label>Tipo de dieta</label>
+        <select id="fTipoDieta">
           <option value="">Sin especificar</option>
-          <option value="sedentaria">Sedentaria</option>
-          <option value="baja">Baja</option>
-          <option value="moderada">Moderada</option>
-          <option value="alta">Alta</option>
-          <option value="muy_alta">Muy alta</option>
+          <option value="Omnívoro/a">Omnívoro/a</option>
+          <option value="Vegetariano/a">Vegetariano/a</option>
+          <option value="Vegano/a">Vegano/a</option>
+          <option value="Ovolactovegetariano/a">Ovolactovegetariano/a</option>
+          <option value="Pescetariano/a">Pescetariano/a</option>
+          <option value="Otro">Otro</option>
         </select>
+        <label>Actividad física</label>
+        <div id="fActividadesList"></div>
+        <button type="button" class="btn-mini" onclick="agregarFilaActividad('fActividadesList')" style="margin-bottom:14px;">+ Agregar actividad</button>
+        <label>Medicamentos / suplementación regular</label>
+        <input id="fMedicamentos" placeholder="Ej: ninguno, o detalle">
+        <label>Notas / información relevante</label>
+        <textarea id="fNotas" rows="3" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;"></textarea>
+        <label style="margin-top:20px;">Usuario</label>
+        <input id="fUsuario" placeholder="ej: sofia.fernandez">
+        <label>Contraseña</label>
+        <div class="row">
+          <input id="fPassword" placeholder="Contraseña simple">
+          <button class="btn-mini" onclick="generarPassword()">Generar</button>
+        </div>
         <div class="hint">El consultante va a usar el usuario y contraseña para entrar a su Biblioteca de Recursos.</div>
         <button class="btn" onclick="crearConsultante()">Crear consultante</button>
         <div class="msg" id="msgCrear"></div>
@@ -237,16 +261,20 @@
   <div class="modal-card">
     <h2 style="margin:0 0 4px;font-size:15px;">Info del consultante</h2>
     <div class="cd-hint" id="eDesdeInfo" style="margin-bottom:16px;">—</div>
-    <label>Nombre</label>
+    <label>Tipo de servicio</label>
+    <select id="eTipoServicio">
+      <option value="Deportivo">Nutrición Deportiva</option>
+      <option value="A Punto">Nutrición a Punto</option>
+      <option value="EAN + Hábitos">EAN + Hábitos</option>
+    </select>
+    <label>Nombre y Apellido</label>
     <input id="eNombre">
     <label>Nombre para el saludo</label>
     <input id="eNombreDisplay">
-    <label>Usuario</label>
-    <input id="eUsuario">
-    <label>Contraseña</label>
-    <input id="ePassword">
-    <label>Fecha de nacimiento</label>
-    <input id="eFechaNac" type="date">
+    <label>DNI / Cédula de Identidad</label>
+    <input id="eDni">
+    <label>Fecha de nacimiento <span id="eEdadTxt" style="font-weight:400;color:var(--ink-3);"></span></label>
+    <input id="eFechaNac" type="date" oninput="mostrarEdad('eFechaNac','eEdadTxt')">
     <label>Sexo</label>
     <select id="eSexo">
       <option value="">Sin especificar</option>
@@ -254,15 +282,35 @@
       <option value="M">Masculino</option>
       <option value="Otro">Otro</option>
     </select>
-    <label>Actividad física</label>
-    <select id="eActividad">
+    <label>Talla (cm)</label>
+    <input id="eTalla" type="number">
+    <label>Peso actual (kg)</label>
+    <input id="ePeso" type="number" step="0.1">
+    <label>Número de celular</label>
+    <input id="eCelular">
+    <label>Dirección de email</label>
+    <input id="eEmail" type="email">
+    <label>Tipo de dieta</label>
+    <select id="eTipoDieta">
       <option value="">Sin especificar</option>
-      <option value="sedentaria">Sedentaria</option>
-      <option value="baja">Baja</option>
-      <option value="moderada">Moderada</option>
-      <option value="alta">Alta</option>
-      <option value="muy_alta">Muy alta</option>
+      <option value="Omnívoro/a">Omnívoro/a</option>
+      <option value="Vegetariano/a">Vegetariano/a</option>
+      <option value="Vegano/a">Vegano/a</option>
+      <option value="Ovolactovegetariano/a">Ovolactovegetariano/a</option>
+      <option value="Pescetariano/a">Pescetariano/a</option>
+      <option value="Otro">Otro</option>
     </select>
+    <label>Actividad física</label>
+    <div id="eActividadesList"></div>
+    <button type="button" class="btn-mini" onclick="agregarFilaActividad('eActividadesList')" style="margin-bottom:14px;">+ Agregar actividad</button>
+    <label>Medicamentos / suplementación regular</label>
+    <input id="eMedicamentos">
+    <label>Notas / información relevante</label>
+    <textarea id="eNotas" rows="3" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;"></textarea>
+    <label style="margin-top:20px;">Usuario</label>
+    <input id="eUsuario">
+    <label>Contraseña</label>
+    <input id="ePassword">
     <button class="btn" onclick="guardarEdicion()">Guardar cambios</button>
     <button class="link-btn muted" style="display:block;width:100%;text-align:center;margin-top:12px;" onclick="cerrarEditar()">Cancelar</button>
     <div class="msg" id="msgEditar"></div>
@@ -329,6 +377,8 @@ async function cambiarMiPassword(){
 function toggleCrear(){
   document.getElementById('crearHead').classList.toggle('open');
   document.getElementById('crearBody').classList.toggle('open');
+  const list = document.getElementById('fActividadesList');
+  if(list.children.length === 0) agregarFilaActividad('fActividadesList');
 }
 
 function toggleConsultantes(){
@@ -352,6 +402,40 @@ function slugify(s){
 function sugerirUsuario(){
   const nombre = document.getElementById('fNombre').value;
   document.getElementById('fUsuario').value = slugify(nombre);
+}
+
+const TIPOS_ACTIVIDAD = ['Musculación / Pesas','Cardio (cinta, bici fija, elíptico)','Running / Trote','Ciclismo','Natación','CrossFit / HIIT','Fútbol','Otro deporte de equipo','Yoga / Pilates','Caminata','Otra'];
+
+function mostrarEdad(inputId, txtId){
+  const val = document.getElementById(inputId).value;
+  const txtEl = document.getElementById(txtId);
+  if(!val){ txtEl.textContent = ''; return; }
+  const nac = new Date(val);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nac.getFullYear();
+  const m = hoy.getMonth() - nac.getMonth();
+  if(m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+  txtEl.textContent = `— ${edad} años`;
+}
+
+function filaActividadHtml(tipo, tiempo){
+  const opts = TIPOS_ACTIVIDAD.map(t=>`<option value="${t}" ${t===tipo?'selected':''}>${t}</option>`).join('');
+  return `<div class="row actividad-row" style="margin-bottom:8px;">
+    <select class="act-tipo">${opts}</select>
+    <input class="act-tiempo" placeholder="Ej: 60 min, 4 veces/sem" value="${tiempo||''}">
+    <button type="button" class="btn-mini" onclick="this.closest('.actividad-row').remove()">✕</button>
+  </div>`;
+}
+function agregarFilaActividad(containerId, tipo, tiempo){
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = filaActividadHtml(tipo, tiempo);
+  document.getElementById(containerId).appendChild(wrapper.firstElementChild);
+}
+function leerActividades(containerId){
+  return Array.from(document.querySelectorAll('#'+containerId+' .actividad-row')).map(row=>({
+    tipo: row.querySelector('.act-tipo').value,
+    tiempo: row.querySelector('.act-tiempo').value.trim()
+  })).filter(a=>a.tiempo);
 }
 function sugerirNombreDisplay(){
   const el = document.getElementById('fNombreDisplay');
@@ -378,7 +462,16 @@ async function crearConsultante(){
   const password = document.getElementById('fPassword').value.trim();
   const fechaNac = document.getElementById('fFechaNac').value || null;
   const sexo = document.getElementById('fSexo').value || null;
-  const actividad = document.getElementById('fActividad').value || null;
+  const tipoServicio = document.getElementById('fTipoServicio').value || null;
+  const dni = document.getElementById('fDni').value.trim() || null;
+  const talla = document.getElementById('fTalla').value || null;
+  const peso = document.getElementById('fPeso').value || null;
+  const celular = document.getElementById('fCelular').value.trim() || null;
+  const email = document.getElementById('fEmail').value.trim() || null;
+  const tipoDieta = document.getElementById('fTipoDieta').value || null;
+  const medicamentos = document.getElementById('fMedicamentos').value.trim() || null;
+  const notas = document.getElementById('fNotas').value.trim() || null;
+  const actividades = leerActividades('fActividadesList');
   if(!nombre || !username || !password){
     showMsg('msgCrear','Completá nombre, usuario y contraseña.', false);
     return;
@@ -391,8 +484,18 @@ async function crearConsultante(){
       p_password: password,
       p_fecha_nacimiento: fechaNac,
       p_sexo: sexo,
-      p_actividad_fisica: actividad,
-      p_nombre_display: nombreDisplay || null
+      p_actividad_fisica: null,
+      p_nombre_display: nombreDisplay || null,
+      p_tipo_servicio: tipoServicio,
+      p_dni: dni,
+      p_talla_cm: talla,
+      p_peso_kg: peso,
+      p_celular: celular,
+      p_email: email,
+      p_tipo_dieta: tipoDieta,
+      p_medicamentos: medicamentos,
+      p_notas: notas,
+      p_actividades: actividades
     });
     document.getElementById('msgCrear').className = 'msg';
     document.getElementById('fNombre').value = '';
@@ -401,13 +504,25 @@ async function crearConsultante(){
     document.getElementById('fUsuario').value = '';
     document.getElementById('fPassword').value = '';
     document.getElementById('fFechaNac').value = '';
+    document.getElementById('fEdadTxt').textContent = '';
     document.getElementById('fSexo').value = '';
-    document.getElementById('fActividad').value = '';
+    document.getElementById('fDni').value = '';
+    document.getElementById('fTalla').value = '';
+    document.getElementById('fPeso').value = '';
+    document.getElementById('fCelular').value = '';
+    document.getElementById('fEmail').value = '';
+    document.getElementById('fTipoDieta').value = '';
+    document.getElementById('fMedicamentos').value = '';
+    document.getElementById('fNotas').value = '';
+    document.getElementById('fActividadesList').innerHTML = '';
+    agregarFilaActividad('fActividadesList');
 
     const lista = document.getElementById('lista');
     const emptyEl = lista.querySelector('.empty');
     if(emptyEl) lista.innerHTML = '';
-    const nuevo = { id:newId, nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, estado:'activo', created_at:new Date().toISOString(), fecha_nacimiento:fechaNac, sexo, actividad_fisica:actividad };
+    const nuevo = { id:newId, nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, estado:'activo', created_at:new Date().toISOString(),
+      fecha_nacimiento:fechaNac, sexo, tipo_servicio:tipoServicio, dni, talla_cm:talla, peso_kg:peso, celular, email, tipo_dieta:tipoDieta,
+      medicamentos, notas, actividades };
     const wrapper = document.createElement('div');
     wrapper.innerHTML = renderConsultante(nuevo);
     const el = wrapper.firstElementChild;
@@ -537,13 +652,26 @@ function abrirInfoPopup(id){
   const fecha = new Date(c.created_at).toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'2-digit'});
   document.getElementById('modalEditar').dataset.id = id;
   document.getElementById('eDesdeInfo').textContent = `Consultante desde ${fecha}`;
+  document.getElementById('eTipoServicio').value = c.tipo_servicio || 'Deportivo';
   document.getElementById('eNombre').value = c.nombre || '';
   document.getElementById('eNombreDisplay').value = c.nombre_display || '';
+  document.getElementById('eDni').value = c.dni || '';
   document.getElementById('eUsuario').value = c.username || '';
   document.getElementById('ePassword').value = c.password || '';
   document.getElementById('eFechaNac').value = c.fecha_nacimiento || '';
+  mostrarEdad('eFechaNac','eEdadTxt');
   document.getElementById('eSexo').value = c.sexo || '';
-  document.getElementById('eActividad').value = c.actividad_fisica || '';
+  document.getElementById('eTalla').value = c.talla_cm || '';
+  document.getElementById('ePeso').value = c.peso_kg || '';
+  document.getElementById('eCelular').value = c.celular || '';
+  document.getElementById('eEmail').value = c.email || '';
+  document.getElementById('eTipoDieta').value = c.tipo_dieta || '';
+  document.getElementById('eMedicamentos').value = c.medicamentos || '';
+  document.getElementById('eNotas').value = c.notas || '';
+  const actList = document.getElementById('eActividadesList');
+  actList.innerHTML = '';
+  const acts = (c.actividades && c.actividades.length) ? c.actividades : [{tipo:TIPOS_ACTIVIDAD[0], tiempo:''}];
+  acts.forEach(a=> agregarFilaActividad('eActividadesList', a.tipo, a.tiempo));
   document.getElementById('msgEditar').className = 'msg';
   document.getElementById('modalEditar').classList.add('show');
 }
@@ -558,16 +686,30 @@ async function guardarEdicion(){
   const password = document.getElementById('ePassword').value.trim();
   const fecha = document.getElementById('eFechaNac').value || null;
   const sexo = document.getElementById('eSexo').value || null;
-  const actividad = document.getElementById('eActividad').value || null;
+  const tipoServicio = document.getElementById('eTipoServicio').value || null;
+  const dni = document.getElementById('eDni').value.trim() || null;
+  const talla = document.getElementById('eTalla').value || null;
+  const peso = document.getElementById('ePeso').value || null;
+  const celular = document.getElementById('eCelular').value.trim() || null;
+  const email = document.getElementById('eEmail').value.trim() || null;
+  const tipoDieta = document.getElementById('eTipoDieta').value || null;
+  const medicamentos = document.getElementById('eMedicamentos').value.trim() || null;
+  const notas = document.getElementById('eNotas').value.trim() || null;
+  const actividades = leerActividades('eActividadesList');
   if(!nombre || !username || !password){ showMsg('msgEditar','Completá nombre, usuario y contraseña.', false); return; }
   try{
     await rpc('admin_editar_consultante', {
       p_id: id, p_nombre: nombre, p_username: username,
-      p_fecha_nacimiento: fecha, p_sexo: sexo, p_actividad_fisica: actividad,
-      p_nombre_display: nombreDisplay || null, p_password: password
+      p_fecha_nacimiento: fecha, p_sexo: sexo, p_actividad_fisica: null,
+      p_nombre_display: nombreDisplay || null, p_password: password,
+      p_tipo_servicio: tipoServicio, p_dni: dni, p_talla_cm: talla, p_peso_kg: peso,
+      p_celular: celular, p_email: email, p_tipo_dieta: tipoDieta, p_medicamentos: medicamentos,
+      p_notas: notas, p_actividades: actividades
     });
     const c = window.CONSULTANTES_MAP[id];
-    c.nombre = nombre; c.nombre_display = nombreDisplay || nombre.split(' ')[0]; c.username = username; c.password = password; c.fecha_nacimiento = fecha; c.sexo = sexo; c.actividad_fisica = actividad;
+    Object.assign(c, {nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, fecha_nacimiento: fecha, sexo,
+      tipo_servicio: tipoServicio, dni, talla_cm: talla, peso_kg: peso, celular, email, tipo_dieta: tipoDieta,
+      medicamentos, notas, actividades});
     const nombreEl = document.querySelector(`.consultante[data-id="${id}"] .c-nombre`);
     nombreEl.innerHTML = `${nombre}<svg class="c-chev" id="chev-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
     nombreEl.setAttribute('onclick', `toggleDetalle('${id}')`);
