@@ -6,6 +6,7 @@
 <title>NutriUst — Nutrición Deportiva</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,900;1,600&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
   :root{
@@ -16,6 +17,8 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{scroll-behavior:smooth; touch-action:manipulation;}
+  *{scrollbar-width:none; -ms-overflow-style:none;}
+  *::-webkit-scrollbar{width:0; height:0; display:none;}
   html,body{margin:0;padding:0;height:100%;}
   body{
     font-family:'Plus Jakarta Sans', sans-serif; color:var(--ink-1);
@@ -139,8 +142,8 @@
   .block-ul li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--blue-2);}
   .block-ol{margin:0 0 15px;padding-left:22px;color:var(--ink-2);font-size:14px;line-height:1.7;}
   .block-ol li{margin-bottom:8px;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;}
-  .callout{background:var(--chip);border-radius:14px;padding:16px 18px;font-size:13.5px;color:var(--ink-1);font-weight:500;line-height:1.65;margin:18px 0;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;}
-  .callout.strong{background:linear-gradient(135deg, rgba(0,114,251,0.10), rgba(153,197,255,0.18));border:1px solid rgba(0,114,251,0.20);}
+  .callout{background:var(--accent-wash);border-left:4px solid var(--accent);border-radius:0 14px 14px 0;padding:16px 20px;font-size:13.5px;color:var(--ink-1);font-weight:500;line-height:1.65;margin:18px 0;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;transition:background .6s ease, border-color .6s ease;}
+  .callout.strong{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:16px;}
   .xlink{display:inline-flex;align-items:center;gap:5px;background:var(--chip);color:var(--blue);font-size:13px;font-weight:600;padding:3px 10px;border-radius:8px;border:1px solid rgba(0,114,251,0.25);text-decoration:none;margin:2px 0;}
   .xlink svg{width:11px;height:11px;flex-shrink:0;}
   .fab-row{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:calc(100% - 40px);max-width:500px;display:none;gap:10px;z-index:15;}
@@ -167,10 +170,11 @@
     background: linear-gradient(180deg, var(--accent-wash) 0%, transparent 100%);
     border-radius: 28px; transition: background .6s ease;
   }
-  .chapter-eyebrow{font-family:'DM Mono', monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:inline-block;transition:color .6s ease;}
-  .chapter-title{font-size:30px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-1);line-height:1.15;max-width:480px;margin:0 auto;}
-  .chapter-rule{width:46px;height:4px;border-radius:4px;background:var(--accent);margin:20px auto 0;transition:background .6s ease;}
-  @media (min-width:900px){ .chapter-title{font-size:42px;max-width:620px;} .chapter-open{padding:80px 20px 46px;} }
+  .chapter-num{font-family:'Fraunces',serif; font-weight:900; font-size:56px; line-height:1; color:var(--accent); opacity:0.28; margin-bottom:-14px; transition:color .6s ease;}
+  .chapter-eyebrow{font-family:'DM Mono', monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;padding:5px 14px;border-radius:100px;background:var(--accent-wash);display:inline-block;transition:color .6s ease, background .6s ease;}
+  .chapter-title{font-family:'Fraunces',serif;font-size:32px;font-weight:900;letter-spacing:-0.01em;color:var(--ink-1);line-height:1.1;max-width:480px;margin:0 auto;}
+  .chapter-rule{width:46px;height:4px;border-radius:4px;background:var(--accent);margin:22px auto 0;transition:background .6s ease;}
+  @media (min-width:900px){ .chapter-title{font-size:46px;max-width:640px;} .chapter-open{padding:80px 20px 46px;} .chapter-num{font-size:72px;} }
 
   /* ===== Sistema de Puntos (merged native screen) ===== */
   #screen-sdp{position:fixed; inset:0; z-index:10; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; opacity:0; transform:translateY(28px); pointer-events:none; transition:opacity .32s ease, transform .38s cubic-bezier(.22,1,.36,1);}
@@ -2428,7 +2432,7 @@ function openReaderData(r){
     const color = SECTION_COLORS[i % SECTION_COLORS.length];
     const secEl = document.createElement('section');
     secEl.className='sec'; secEl.id=sec.id; secEl.dataset.color=color;
-    const opener = `<div class="chapter-open"><span class="chapter-eyebrow">${r.crumb}</span><div class="chapter-title">${sec.title}</div><div class="chapter-rule"></div></div>`;
+    const opener = `<div class="chapter-open"><span class="chapter-num">${sec.num}</span><br><span class="chapter-eyebrow">${r.crumb}</span><div class="chapter-title">${sec.title}</div><div class="chapter-rule"></div></div>`;
     secEl.innerHTML = opener + sec.blocks.map(blockHtml).join('');
     sectionsEl.appendChild(secEl);
     const row = `<a class="idx-item" href="#${sec.id}" onclick="event.preventDefault();scrollToSection('${sec.id}')"><span class="idx-num" style="color:${color}">●</span>${sec.title}</a>`;
