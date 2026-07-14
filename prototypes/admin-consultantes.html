@@ -133,6 +133,10 @@
   .pw-card{position:relative; max-height:0; opacity:0; overflow:hidden; padding-top:0; padding-bottom:0; margin-bottom:0; border-width:0; transition:max-height .32s ease, opacity .28s ease, padding .32s ease, margin .32s ease, border-width .32s ease;}
   .pw-card.show{max-height:420px; opacity:1; padding-top:20px; padding-bottom:20px; margin-bottom:20px; border-width:1px;}
   .pw-close{position:absolute; top:14px; right:14px; width:26px; height:26px; border-radius:8px; background:var(--chip); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-2); font-size:12px; line-height:1; padding:0;}
+  .horarios-check{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .horario-opt{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;font-size:12.5px;cursor:pointer;}
+  .horario-opt input{width:auto;margin:0;}
+  .horario-opt.checked{border-color:var(--blue);background:var(--chip);}
 </style>
 </head>
 <body>
@@ -220,6 +224,8 @@
         <label>Actividad física</label>
         <div id="fActividadesList"></div>
         <button type="button" class="btn-mini" onclick="agregarFilaActividad('fActividadesList')" style="margin-bottom:14px;">+ Agregar actividad</button>
+        <label>Horario/s de entrenamiento (para el Timing Nutricional)</label>
+        <div id="fHorarios" class="horarios-check"></div>
         <label>Medicamentos / suplementación regular</label>
         <input id="fMedicamentos" placeholder="Ej: ninguno, o detalle">
         <label>Notas / información relevante</label>
@@ -304,6 +310,8 @@
     <label>Actividad física</label>
     <div id="eActividadesList"></div>
     <button type="button" class="btn-mini" onclick="agregarFilaActividad('eActividadesList')" style="margin-bottom:14px;">+ Agregar actividad</button>
+    <label>Horario/s de entrenamiento (para el Timing Nutricional)</label>
+    <div id="eHorarios" class="horarios-check"></div>
     <label>Medicamentos / suplementación regular</label>
     <input id="eMedicamentos">
     <label>Notas / información relevante</label>
@@ -379,7 +387,10 @@ function toggleCrear(){
   document.getElementById('crearHead').classList.toggle('open');
   document.getElementById('crearBody').classList.toggle('open');
   const list = document.getElementById('fActividadesList');
-  if(list.children.length === 0) agregarFilaActividad('fActividadesList');
+  if(list.children.length === 0){
+    agregarFilaActividad('fActividadesList');
+    renderHorariosCheck('fHorarios');
+  }
 }
 
 function toggleConsultantes(){
@@ -406,6 +417,28 @@ function sugerirUsuario(){
 }
 
 const TIPOS_ACTIVIDAD = ['Musculación / Pesas','Fisicoculturismo','Cardio (cinta, bici fija, elíptico)','Running / Trote','Ciclismo','Natación','CrossFit / HIIT','Fútbol','Otro deporte de equipo','Yoga / Pilates','Caminata','Otra'];
+
+const HORARIOS_OPTIONS = [
+  {key:'68', label:'🌅 6 – 8 hs'},
+  {key:'911', label:'🌄 9 – 11 hs'},
+  {key:'1214', label:'☀️ 12 – 14 hs'},
+  {key:'1517', label:'🌆 15 – 17 hs'},
+  {key:'1719', label:'🌇 17 – 19 hs'},
+  {key:'2022', label:'🌙 20 – 22 hs'}
+];
+
+function renderHorariosCheck(containerId, selected){
+  selected = selected || [];
+  const html = HORARIOS_OPTIONS.map(o=>{
+    const checked = selected.includes(o.key) ? 'checked' : '';
+    const cls = selected.includes(o.key) ? 'horario-opt checked' : 'horario-opt';
+    return `<label class="${cls}"><input type="checkbox" value="${o.key}" onchange="this.closest('label').classList.toggle('checked', this.checked)">${o.label}</label>`;
+  }).join('');
+  document.getElementById(containerId).innerHTML = html;
+}
+function leerHorarios(containerId){
+  return Array.from(document.querySelectorAll('#'+containerId+' input:checked')).map(i=>i.value);
+}
 
 function mostrarEdad(inputId, txtId){
   const val = document.getElementById(inputId).value;
@@ -484,6 +517,7 @@ async function crearConsultante(){
   const medicamentos = document.getElementById('fMedicamentos').value.trim() || null;
   const notas = document.getElementById('fNotas').value.trim() || null;
   const actividades = leerActividades('fActividadesList');
+  const horarios = leerHorarios('fHorarios');
   if(!nombre || !username || !password){
     showMsg('msgCrear','Completá nombre, usuario y contraseña.', false);
     return;
@@ -507,7 +541,8 @@ async function crearConsultante(){
       p_tipo_dieta: tipoDieta,
       p_medicamentos: medicamentos,
       p_notas: notas,
-      p_actividades: actividades
+      p_actividades: actividades,
+      p_horarios_entrenamiento: horarios
     });
     document.getElementById('msgCrear').className = 'msg';
     document.getElementById('fNombre').value = '';
@@ -528,13 +563,14 @@ async function crearConsultante(){
     document.getElementById('fNotas').value = '';
     document.getElementById('fActividadesList').innerHTML = '';
     agregarFilaActividad('fActividadesList');
+    renderHorariosCheck('fHorarios');
 
     const lista = document.getElementById('lista');
     const emptyEl = lista.querySelector('.empty');
     if(emptyEl) lista.innerHTML = '';
     const nuevo = { id:newId, nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, estado:'activo', created_at:new Date().toISOString(),
       fecha_nacimiento:fechaNac, sexo, tipo_servicio:tipoServicio, dni, talla_cm:talla, peso_kg:peso, celular, email, tipo_dieta:tipoDieta,
-      medicamentos, notas, actividades };
+      medicamentos, notas, actividades, horarios_entrenamiento: horarios };
     const wrapper = document.createElement('div');
     wrapper.innerHTML = renderConsultante(nuevo);
     const el = wrapper.firstElementChild;
@@ -684,6 +720,7 @@ function abrirInfoPopup(id){
   actList.innerHTML = '';
   const acts = (c.actividades && c.actividades.length) ? c.actividades : [{tipo:TIPOS_ACTIVIDAD[0], tiempo:''}];
   acts.forEach(a=> agregarFilaActividad('eActividadesList', a.tipo, a.tiempo));
+  renderHorariosCheck('eHorarios', c.horarios_entrenamiento || []);
   document.getElementById('msgEditar').className = 'msg';
   document.getElementById('modalEditar').classList.add('show');
 }
@@ -708,6 +745,7 @@ async function guardarEdicion(){
   const medicamentos = document.getElementById('eMedicamentos').value.trim() || null;
   const notas = document.getElementById('eNotas').value.trim() || null;
   const actividades = leerActividades('eActividadesList');
+  const horarios = leerHorarios('eHorarios');
   if(!nombre || !username || !password){ showMsg('msgEditar','Completá nombre, usuario y contraseña.', false); return; }
   try{
     await rpc('admin_editar_consultante', {
@@ -716,12 +754,12 @@ async function guardarEdicion(){
       p_nombre_display: nombreDisplay || null, p_password: password,
       p_tipo_servicio: tipoServicio, p_dni: dni, p_talla_cm: talla, p_peso_kg: peso,
       p_celular: celular, p_email: email, p_tipo_dieta: tipoDieta, p_medicamentos: medicamentos,
-      p_notas: notas, p_actividades: actividades
+      p_notas: notas, p_actividades: actividades, p_horarios_entrenamiento: horarios
     });
     const c = window.CONSULTANTES_MAP[id];
     Object.assign(c, {nombre, nombre_display: nombreDisplay || nombre.split(' ')[0], username, password, fecha_nacimiento: fecha, sexo,
       tipo_servicio: tipoServicio, dni, talla_cm: talla, peso_kg: peso, celular, email, tipo_dieta: tipoDieta,
-      medicamentos, notas, actividades});
+      medicamentos, notas, actividades, horarios_entrenamiento: horarios});
     const nombreEl = document.querySelector(`.consultante[data-id="${id}"] .c-nombre`);
     nombreEl.innerHTML = `${nombre}<svg class="c-chev" id="chev-${id}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
     nombreEl.setAttribute('onclick', `toggleDetalle('${id}')`);
