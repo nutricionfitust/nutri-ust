@@ -2453,6 +2453,7 @@ async function handleConsultanteLogin(){
   try{
     const rows = await rpc('login_consultante', { p_username: user, p_password: pass });
     if(!rows || !rows.length){ msgEl.textContent='Usuario o contraseña incorrectos.'; msgEl.classList.add('show'); return; }
+    sessionStorage.removeItem('nfu_admin_session');
     localStorage.setItem('nfu_consultante_id', rows[0].id);
     localStorage.setItem('nfu_consultante_sexo', rows[0].sexo || 'M');
     localStorage.setItem('nfu_consultante_nombre', rows[0].nombre_display || rows[0].nombre);
