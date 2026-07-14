@@ -106,6 +106,9 @@ async function handleSubmit(){
     // 1) ¿es el nutricionista (admin)?
     const admin = await rpc('login_nutricionista', { p_identificador: ident, p_password: pass });
     if(admin && admin.length){
+      localStorage.removeItem('nfu_consultante_id');
+      localStorage.removeItem('nfu_consultante_nombre');
+      localStorage.removeItem('nfu_consultante_sexo');
       sessionStorage.setItem('nfu_admin_session', 'true');
       sessionStorage.setItem('nfu_admin_ident', admin[0].username || admin[0].email);
       window.location.href = '/prototypes/admin-consultantes.html';
@@ -114,7 +117,9 @@ async function handleSubmit(){
     // 2) ¿es un consultante?
     const consultante = await rpc('login_consultante', { p_username: ident, p_password: pass });
     if(consultante && consultante.length){
+      sessionStorage.removeItem('nfu_admin_session');
       localStorage.setItem('nfu_consultante_id', consultante[0].id);
+      localStorage.setItem('nfu_consultante_sexo', consultante[0].sexo || 'M');
       localStorage.setItem('nfu_consultante_nombre', consultante[0].nombre_display || consultante[0].nombre);
       window.location.href = '/prototypes/plan_nutricional_reader.html';
       return;
