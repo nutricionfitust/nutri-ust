@@ -160,6 +160,16 @@
   .fab-row.show{display:flex;}
   .fab{flex:1;background:var(--blue);color:#fff;border:none;border-radius:14px;padding:15px 16px;font-family:'Plus Jakarta Sans';font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 14px 30px rgba(0,114,251,0.30);cursor:pointer;}
   .fab.ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue);box-shadow:0 8px 22px var(--shadow);flex:0 0 auto;width:52px;}
+  .fab-pdf{padding:12px 13px;font-size:12.5px;}
+  #searchBar{position:fixed;left:12px;right:12px;bottom:76px;z-index:19;background:#fff;border-radius:16px;box-shadow:0 14px 34px rgba(11,27,51,0.22);border:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:8px 8px 8px 14px;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .26s ease, transform .26s ease;}
+  #searchBar.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  #searchInput{flex:1;border:none;outline:none;font-size:14px;font-family:'Plus Jakarta Sans';background:transparent;min-width:0;}
+  #searchCount{font-size:12px;color:var(--ink-3);font-family:'DM Mono',monospace;white-space:nowrap;padding:0 2px;}
+  .search-btn{width:30px;height:30px;border-radius:9px;background:var(--chip);border:none;display:flex;align-items:center;justify-content:center;color:var(--blue);cursor:pointer;flex-shrink:0;}
+  .search-btn:disabled{opacity:0.35;cursor:default;}
+  mark.search-hit{background:#FFF3B0;color:inherit;border-radius:3px;padding:0 1px;}
+  mark.search-hit.current{background:#0072FB;color:#fff;}
+  @media (min-width:700px){ #searchBar{max-width:480px;left:50%;right:auto;transform:translate(-50%,10px);} #searchBar.show{transform:translate(-50%,0);} }
   .fab svg{width:16px;height:16px;}
   #timingPopup{position:fixed;inset:0;z-index:25;background:rgba(11,27,51,0.4);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s ease;display:flex;align-items:flex-end;justify-content:center;}
   #timingPopup.show{opacity:1;pointer-events:auto;}
@@ -683,24 +693,6 @@
   </div>
   <div class="doc" id="doc">
     <div class="doc-cover">
-      <svg viewBox="0 0 200 140" width="180" height="126" style="margin:0 auto 8px;display:block;" xmlns="http://www.w3.org/2000/svg">
-        <!-- plate -->
-        <circle cx="100" cy="72" r="54" fill="#FFFFFF" stroke="#E3ECFB" stroke-width="2"/>
-        <circle cx="100" cy="72" r="54" fill="none" stroke="#0072FB" stroke-width="1.5" stroke-dasharray="2 5" opacity="0.35"/>
-        <!-- three macro sections, matching the color system used throughout the document -->
-        <path d="M100 72 L100 22 A50 50 0 0 1 143.3 97 Z" fill="#0072FB" opacity="0.85"/>
-        <path d="M100 72 L143.3 97 A50 50 0 0 1 56.7 97 Z" fill="#1F9D6B" opacity="0.85"/>
-        <path d="M100 72 L56.7 97 A50 50 0 0 1 100 22 Z" fill="#8B5CF6" opacity="0.85"/>
-        <circle cx="100" cy="72" r="16" fill="#FBFDFF"/>
-        <!-- simple fork + knife -->
-        <g stroke="#FBFDFF" stroke-width="2.4" stroke-linecap="round" fill="none">
-          <path d="M100 62v20"/>
-          <path d="M95 62v8M100 62v8M105 62v8"/>
-        </g>
-        <!-- energy swoosh around the plate, representing performance -->
-        <path d="M28 100 Q10 72 28 44" stroke="#0072FB" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
-        <path d="M172 100 Q190 72 172 44" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
-      </svg>
       <h1 class="reader-h1" id="readerH1">—</h1>
       <div class="reader-sub" id="readerSub"></div>
     </div>
@@ -713,10 +705,20 @@
 
 <div class="fab-row" id="fabRow">
   <button class="fab ghost" onclick="toggleDrawer(true)" title="Índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
-  <button class="fab" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Descargar PDF</button>
+  <button class="fab ghost" onclick="abrirBuscador()" title="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+  <button class="fab fab-pdf" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Descargar PDF</button>
 </div>
 <div id="idxDrawer" onclick="if(event.target===this) toggleDrawer(false)">
   <div class="drawer-panel"><div class="drawer-head"><b>Índice</b><button class="drawer-close" onclick="toggleDrawer(false)">✕</button></div><div id="drawerList"></div></div>
+</div>
+
+<div id="searchBar">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3);flex-shrink:0;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+  <input id="searchInput" placeholder="Buscar en el documento..." oninput="buscarEnDocumento(this.value)">
+  <span id="searchCount"></span>
+  <button class="search-btn" id="searchPrevBtn" onclick="moverBusqueda(-1)" title="Anterior"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 15l-6-6-6 6"/></svg></button>
+  <button class="search-btn" id="searchNextBtn" onclick="moverBusqueda(1)" title="Siguiente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button>
+  <button class="search-btn" onclick="cerrarBuscador()" title="Cerrar">✕</button>
 </div>
 
 <div id="timingPopup" onclick="if(event.target===this) cerrarTimingPopup()">
@@ -2846,6 +2848,90 @@ function closeReader(){
   document.getElementById('idxDrawer').classList.remove('show');
 }
 function toggleDrawer(open){ document.getElementById('idxDrawer').classList.toggle('show', open); }
+
+window.SEARCH_MATCHES = [];
+window.SEARCH_CURRENT = -1;
+
+function abrirBuscador(){
+  document.getElementById('searchBar').classList.add('show');
+  setTimeout(()=> document.getElementById('searchInput').focus(), 260);
+}
+function cerrarBuscador(){
+  document.getElementById('searchBar').classList.remove('show');
+  limpiarResaltados();
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchCount').textContent = '';
+}
+
+function limpiarResaltados(){
+  document.querySelectorAll('mark.search-hit').forEach(m=>{
+    const parent = m.parentNode;
+    if(!parent) return;
+    parent.replaceChild(document.createTextNode(m.textContent), m);
+    parent.normalize();
+  });
+  window.SEARCH_MATCHES = [];
+  window.SEARCH_CURRENT = -1;
+}
+
+function buscarEnDocumento(query){
+  limpiarResaltados();
+  query = query.trim();
+  const countEl = document.getElementById('searchCount');
+  if(!query){ countEl.textContent = ''; return; }
+  const root = document.getElementById('sections');
+  if(!root) return;
+  const lowerQ = query.toLowerCase();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const textNodes = [];
+  let node;
+  while(node = walker.nextNode()){
+    if(node.nodeValue && node.nodeValue.toLowerCase().includes(lowerQ)) textNodes.push(node);
+  }
+  textNodes.forEach(tn=>{
+    const text = tn.nodeValue;
+    const lowerText = text.toLowerCase();
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0;
+    let idx = lowerText.indexOf(lowerQ);
+    while(idx !== -1){
+      if(idx > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, idx)));
+      const mark = document.createElement('mark');
+      mark.className = 'search-hit';
+      mark.textContent = text.slice(idx, idx + query.length);
+      frag.appendChild(mark);
+      window.SEARCH_MATCHES.push(mark);
+      lastIdx = idx + query.length;
+      idx = lowerText.indexOf(lowerQ, lastIdx);
+    }
+    if(lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
+  if(window.SEARCH_MATCHES.length){
+    window.SEARCH_CURRENT = 0;
+    resaltarActual();
+  } else {
+    countEl.textContent = '0/0';
+  }
+}
+
+function resaltarActual(){
+  window.SEARCH_MATCHES.forEach((m,i)=> m.classList.toggle('current', i === window.SEARCH_CURRENT));
+  const current = window.SEARCH_MATCHES[window.SEARCH_CURRENT];
+  if(current) current.scrollIntoView({behavior:'smooth', block:'center'});
+  document.getElementById('searchCount').textContent = `${window.SEARCH_CURRENT+1}/${window.SEARCH_MATCHES.length}`;
+}
+
+function moverBusqueda(dir){
+  if(!window.SEARCH_MATCHES.length) return;
+  window.SEARCH_CURRENT = (window.SEARCH_CURRENT + dir + window.SEARCH_MATCHES.length) % window.SEARCH_MATCHES.length;
+  resaltarActual();
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); moverBusqueda(e.shiftKey ? -1 : 1); }
+  if(e.key === 'Escape'){ e.preventDefault(); cerrarBuscador(); }
+});
 function openSDP(esTopLevel){
   document.getElementById('screen-sdp').classList.add('show');
   document.getElementById('sdpBackBtn').classList.add('show');
