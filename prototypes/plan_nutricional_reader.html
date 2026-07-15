@@ -683,6 +683,24 @@
   </div>
   <div class="doc" id="doc">
     <div class="doc-cover">
+      <svg viewBox="0 0 200 140" width="180" height="126" style="margin:0 auto 8px;display:block;" xmlns="http://www.w3.org/2000/svg">
+        <!-- plate -->
+        <circle cx="100" cy="72" r="54" fill="#FFFFFF" stroke="#E3ECFB" stroke-width="2"/>
+        <circle cx="100" cy="72" r="54" fill="none" stroke="#0072FB" stroke-width="1.5" stroke-dasharray="2 5" opacity="0.35"/>
+        <!-- three macro sections, matching the color system used throughout the document -->
+        <path d="M100 72 L100 22 A50 50 0 0 1 143.3 97 Z" fill="#0072FB" opacity="0.85"/>
+        <path d="M100 72 L143.3 97 A50 50 0 0 1 56.7 97 Z" fill="#1F9D6B" opacity="0.85"/>
+        <path d="M100 72 L56.7 97 A50 50 0 0 1 100 22 Z" fill="#8B5CF6" opacity="0.85"/>
+        <circle cx="100" cy="72" r="16" fill="#FBFDFF"/>
+        <!-- simple fork + knife -->
+        <g stroke="#FBFDFF" stroke-width="2.4" stroke-linecap="round" fill="none">
+          <path d="M100 62v20"/>
+          <path d="M95 62v8M100 62v8M105 62v8"/>
+        </g>
+        <!-- energy swoosh around the plate, representing performance -->
+        <path d="M28 100 Q10 72 28 44" stroke="#0072FB" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
+        <path d="M172 100 Q190 72 172 44" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
+      </svg>
       <h1 class="reader-h1" id="readerH1">—</h1>
       <div class="reader-sub" id="readerSub"></div>
     </div>
@@ -2457,6 +2475,22 @@ function abrirSeccionPopup(sectionId){
 }
 function cerrarSeccionPopup(){
   document.getElementById('seccionPopup').classList.remove('show');
+}
+
+function abrirCondimentosPopup(){
+  const body = document.getElementById('seccionPopupInner');
+  const items = [
+    "Condimentos — salados: sal.",
+    "Condimentos — aromáticos: albahaca, azafrán, canela, cardamomo, cilantro, comino, cúrcuma, laurel, nuez moscada, orégano, perejil, romero, mostaza, tomillo, eneldo, clavo de olor, semillas de hinojo, menta, esencia de vainilla, ralladura de limón, ralladura de naranja, ralladura de mandarina, anís, etc.",
+    "Condimentos — ácidos: limón, vinagreta, aceto balsámico, lima.",
+    "Condimentos — picantes: jengibre, wasabi, pimienta (roja, negra, blanca, rosada, mix), ají molido, pimentón picante, pimentón dulce, paprika, chile, curry.",
+    "Condimentos — aliáceos: cebolla de verdeo, cebolla, ajo, ciboulette, échalote, puerro.",
+    "Salsas y aderezos caseros: provenzal, chimichurri, escabeche, pesto, salsa criolla, vinagreta (con menos aceite y más vinagre)."
+  ];
+  body.innerHTML = `<div style="text-align:center;margin-bottom:16px;">
+    <div style="font-family:'Fraunces',serif;font-weight:900;font-size:19px;color:var(--ink-1);">Condimentos</div>
+  </div>` + blockHtml({t:'ul', v:items});
+  document.getElementById('seccionPopup').classList.add('show');
 }
 
 function blockHtml(b){
