@@ -2389,10 +2389,10 @@ const TIMINGS = {
 function buildTimingCardHtml(key, skipNotas){
   const t = TIMINGS[key];
   if(!t) return '';
-  const secs = t.sections.map(s=>`<div style="margin-bottom:14px;"><div style="font-weight:700;font-size:13px;color:var(--ink-1);margin-bottom:4px;">${s.title}</div><div style="font-size:13px;color:var(--ink-2);line-height:1.6;">${s.body}</div></div>`).join('');
+  const secs = t.sections.map(s=>`<div style="margin-bottom:14px;"><div style="font-weight:700;font-size:14.5px;color:var(--ink-1);margin-bottom:4px;">${s.title}</div><div style="font-size:14.5px;line-height:1.75;color:var(--ink-2);">${s.body}</div></div>`).join('');
   const notasBlock = skipNotas ? '' : `<div style="background:var(--accent-wash, rgba(0,114,251,0.08));border-left:3px solid var(--accent, #0072FB);border-radius:0 12px 12px 0;padding:12px 14px;margin-top:10px;">
-      <div style="font-size:11px;font-weight:700;color:var(--ink-2);margin-bottom:6px;">⚠️ Algunas aclaraciones importantes</div>
-      ${t.notas.map(n=>`<p style="font-size:12.5px;color:var(--ink-2);line-height:1.6;margin-bottom:8px;">${TIMING_NOTAS[n]}</p>`).join('')}
+      <div style="font-size:12px;font-weight:700;color:var(--ink-2);margin-bottom:6px;">⚠️ Algunas aclaraciones importantes</div>
+      ${t.notas.map(n=>`<p style="font-size:14.5px;color:var(--ink-2);line-height:1.75;margin-bottom:8px;">${TIMING_NOTAS[n]}</p>`).join('')}
     </div>`;
   return `<div style="border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;background:#fff;">
     <div style="text-align:center;margin-bottom:16px;">
@@ -2409,7 +2409,7 @@ function buildConsolidatedNotasHtml(){
   const todas = ['ayuno','intra90','dormir'];
   return `<div style="background:var(--accent-wash, rgba(0,114,251,0.08));border-left:3px solid var(--accent, #0072FB);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:14px;">
     <div style="font-size:12px;font-weight:700;color:var(--ink-2);margin-bottom:8px;">⚠️ Algunas aclaraciones importantes</div>
-    ${todas.map(n=>`<p style="font-size:12.5px;color:var(--ink-2);line-height:1.6;margin-bottom:8px;">${TIMING_NOTAS[n]}</p>`).join('')}
+    ${todas.map(n=>`<p style="font-size:14.5px;color:var(--ink-2);line-height:1.75;margin-bottom:8px;">${TIMING_NOTAS[n]}</p>`).join('')}
   </div>`;
 }
 
@@ -2447,14 +2447,14 @@ function abrirRecetaPopup(){
       <span style="font-size:28px;">🔥</span>
       <div style="font-family:'Fraunces',serif;font-weight:900;font-size:19px;color:var(--ink-1);margin-top:4px;">Mi receta</div>
     </div>
-    <p style="font-size:13.5px;color:var(--ink-2);line-height:1.65;margin-bottom:12px;">Por cada litro de bebida vas a estar aportando 5-10% de hidratos (50 a 100 g):</p>
-    <ul style="margin:0 0 14px;padding-left:20px;font-size:13.5px;color:var(--ink-2);line-height:1.8;">
+    <p style="font-size:14.5px;color:var(--ink-2);line-height:1.75;margin-bottom:12px;">Por cada litro de bebida vas a estar aportando 5-10% de hidratos (50 a 100 g):</p>
+    <ul style="margin:0 0 14px;padding-left:20px;font-size:14px;color:var(--ink-2);line-height:1.8;">
       <li>150 a 250 ml de jugo de limón o naranja exprimido (ya aportan sus carbohidratos)</li>
       <li>40 a 80 g de azúcar (según el dulzor que preferís)</li>
       <li>1,5 g de sal de mesa (aprox. 1 blister y medio de pastillero) → te aporta entre 450 y 700 mg de sodio para reponer lo que perdés por sudor</li>
       <li>Completar con agua fría hasta llegar a 1 litro</li>
     </ul>
-    <p style="font-size:13.5px;color:var(--ink-2);line-height:1.65;">Es equivalente a un Gatorade o Powerade, pero más económica y la personalizás vos.</p>
+    <p style="font-size:14.5px;color:var(--ink-2);line-height:1.75;">Es equivalente a un Gatorade o Powerade, pero más económica y la personalizás vos.</p>
   `;
   document.getElementById('recetaPopup').classList.add('show');
 }
