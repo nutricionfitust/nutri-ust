@@ -2769,43 +2769,26 @@ async function descargarPDF(){
 
   try{
     label.textContent = 'Generando…';
-    const fullWidth = docEl.scrollWidth;
-    const fullHeight = docEl.scrollHeight;
-    const scale = window.devicePixelRatio > 1 ? 1.4 : 1.6;
-    const chunkHeight = 1800;
-    const chunks = Math.ceil(fullHeight / chunkHeight);
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r => setTimeout(r, 80));
 
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = Math.round(fullWidth * scale);
-    finalCanvas.height = Math.round(fullHeight * scale);
-    const ctx = finalCanvas.getContext('2d');
-    ctx.fillStyle = '#FBFDFF';
-    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+    const scale = 1.2;
+    const canvas = await html2canvas(docEl, {
+      scale: scale,
+      backgroundColor: '#FBFDFF',
+      useCORS: true,
+      logging: false
+    });
 
-    for(let i=0; i<chunks; i++){
-      const y = i * chunkHeight;
-      const h = Math.min(chunkHeight, fullHeight - y);
-      const canvasChunk = await html2canvas(docEl, {
-        backgroundColor: '#FBFDFF',
-        scale: scale,
-        x: 0, y: y,
-        width: fullWidth, height: h,
-        windowWidth: fullWidth, windowHeight: fullHeight,
-        useCORS: true
-      });
-      ctx.drawImage(canvasChunk, 0, Math.round(y * scale));
-      label.textContent = `Generando… ${Math.round(((i+1)/chunks)*100)}%`;
-    }
-
-    const imgData = finalCanvas.toDataURL('image/jpeg', 0.92);
+    const imgData = canvas.toDataURL('image/jpeg', 0.9);
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
-      orientation: fullHeight >= fullWidth ? 'portrait' : 'landscape',
+      orientation: canvas.height >= canvas.width ? 'portrait' : 'landscape',
       unit: 'px',
-      format: [fullWidth, fullHeight],
+      format: [canvas.width, canvas.height],
       compress: true
     });
-    pdf.addImage(imgData, 'JPEG', 0, 0, fullWidth, fullHeight);
+    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
     pdf.save('Alimentacion-y-Rendimiento-Deportivo.pdf');
   } catch(e){
     alert('Hubo un problema generando el PDF: ' + e.message);
