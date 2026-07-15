@@ -621,6 +621,8 @@
 }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -706,7 +708,7 @@
 <div class="fab-row" id="fabRow">
   <button class="fab ghost" onclick="toggleDrawer(true)" title="Índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
   <button class="fab ghost" onclick="abrirBuscador()" title="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
-  <button class="fab fab-pdf" onclick="alert('Acá va la exportación real a PDF una vez que conectemos el motor de render → print')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Descargar PDF</button>
+  <button class="fab fab-pdf" id="btnDescargarPDF" onclick="descargarPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg><span id="btnPdfLabel">Descargar PDF</span></button>
 </div>
 <div id="idxDrawer" onclick="if(event.target===this) toggleDrawer(false)">
   <div class="drawer-panel"><div class="drawer-head"><b>Índice</b><button class="drawer-close" onclick="toggleDrawer(false)">✕</button></div><div id="drawerList"></div></div>
@@ -2744,6 +2746,74 @@ function hexToRgba(hex, a){
   const h = hex.replace('#','');
   const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
   return `rgba(${r},${g},${b},${a})`;
+}
+
+async function descargarPDF(){
+  if(typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined'){
+    alert('No se pudo cargar el motor de PDF. Revisá tu conexión a internet e intentá de nuevo.');
+    return;
+  }
+  const btn = document.getElementById('btnDescargarPDF');
+  const label = document.getElementById('btnPdfLabel');
+  const originalLabel = label.textContent;
+  btn.disabled = true;
+
+  const docEl = document.getElementById('doc');
+  const chapterOpens = docEl.querySelectorAll('.chapter-open');
+  const originalBgs = [];
+  chapterOpens.forEach((el, i) => {
+    originalBgs.push(el.style.background);
+    const color = SECTION_COLORS[i % SECTION_COLORS.length];
+    el.style.background = `linear-gradient(180deg, ${hexToRgba(color, 0.10)} 0%, transparent 100%)`;
+  });
+
+  try{
+    label.textContent = 'Generando…';
+    const fullWidth = docEl.scrollWidth;
+    const fullHeight = docEl.scrollHeight;
+    const scale = window.devicePixelRatio > 1 ? 1.4 : 1.6;
+    const chunkHeight = 1800;
+    const chunks = Math.ceil(fullHeight / chunkHeight);
+
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = Math.round(fullWidth * scale);
+    finalCanvas.height = Math.round(fullHeight * scale);
+    const ctx = finalCanvas.getContext('2d');
+    ctx.fillStyle = '#FBFDFF';
+    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+    for(let i=0; i<chunks; i++){
+      const y = i * chunkHeight;
+      const h = Math.min(chunkHeight, fullHeight - y);
+      const canvasChunk = await html2canvas(docEl, {
+        backgroundColor: '#FBFDFF',
+        scale: scale,
+        x: 0, y: y,
+        width: fullWidth, height: h,
+        windowWidth: fullWidth, windowHeight: fullHeight,
+        useCORS: true
+      });
+      ctx.drawImage(canvasChunk, 0, Math.round(y * scale));
+      label.textContent = `Generando… ${Math.round(((i+1)/chunks)*100)}%`;
+    }
+
+    const imgData = finalCanvas.toDataURL('image/jpeg', 0.92);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: fullHeight >= fullWidth ? 'portrait' : 'landscape',
+      unit: 'px',
+      format: [fullWidth, fullHeight],
+      compress: true
+    });
+    pdf.addImage(imgData, 'JPEG', 0, 0, fullWidth, fullHeight);
+    pdf.save('Alimentacion-y-Rendimiento-Deportivo.pdf');
+  } catch(e){
+    alert('Hubo un problema generando el PDF: ' + e.message);
+  } finally {
+    chapterOpens.forEach((el, i) => { el.style.background = originalBgs[i]; });
+    btn.disabled = false;
+    label.textContent = originalLabel;
+  }
 }
 let sectionObserver = null;
 function animateScrollTo(container, targetY, duration){
