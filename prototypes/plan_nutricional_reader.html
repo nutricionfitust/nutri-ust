@@ -2759,13 +2759,26 @@ async function descargarPDF(){
   btn.disabled = true;
 
   const coverEl = document.querySelector('.doc-cover');
+  const indexCardEl = document.getElementById('indexCard');
   const secEls = Array.from(document.querySelectorAll('#sections .sec'));
-  const piezas = coverEl ? [coverEl, ...secEls] : secEls;
+  const piezas = secEls;
   const docEl = document.getElementById('doc');
   const anchoReal = docEl.clientWidth;
   const docStyle = getComputedStyle(docEl);
   const padSides = docStyle.paddingLeft;
   const padTop = docStyle.paddingTop;
+
+  let coverClone = null, indexClone = null;
+  if(secEls.length && coverEl){
+    coverClone = coverEl.cloneNode(true);
+    coverClone.style.marginBottom = '24px';
+    secEls[0].insertBefore(coverClone, secEls[0].firstChild);
+    if(indexCardEl){
+      indexClone = indexCardEl.cloneNode(true);
+      indexClone.style.marginBottom = '24px';
+      secEls[0].insertBefore(indexClone, coverClone.nextSibling);
+    }
+  }
 
   try{
     label.textContent = 'Generando…';
@@ -2780,7 +2793,11 @@ async function descargarPDF(){
       const pieza = piezas[i];
       const originalPadding = pieza.style.padding;
       const originalBoxSizing = pieza.style.boxSizing;
+      const originalWidth = pieza.style.width;
+      const originalMaxWidth = pieza.style.maxWidth;
       pieza.style.boxSizing = 'border-box';
+      pieza.style.width = anchoReal + 'px';
+      pieza.style.maxWidth = anchoReal + 'px';
       pieza.style.paddingLeft = padSides;
       pieza.style.paddingRight = padSides;
       pieza.style.paddingTop = padTop;
@@ -2808,6 +2825,8 @@ async function descargarPDF(){
       if(chapterOpen) chapterOpen.style.background = originalBg;
       pieza.style.padding = originalPadding;
       pieza.style.boxSizing = originalBoxSizing;
+      pieza.style.width = originalWidth;
+      pieza.style.maxWidth = originalMaxWidth;
 
       const imgData = canvas.toDataURL('image/jpeg', 0.9);
       if(!pdf){
@@ -2823,6 +2842,8 @@ async function descargarPDF(){
   } catch(e){
     alert('Hubo un problema generando el PDF: ' + e.message);
   } finally {
+    if(coverClone) coverClone.remove();
+    if(indexClone) indexClone.remove();
     btn.disabled = false;
     label.textContent = originalLabel;
   }
