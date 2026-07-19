@@ -2855,6 +2855,10 @@ function hexToRgba(hex, a){
 }
 
 async function descargarPDF(){
+  if(window.CURRENT_DIRECT_PDF_URL){
+    window.open(window.CURRENT_DIRECT_PDF_URL, '_blank');
+    return;
+  }
   if(typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined'){
     alert('No se pudo cargar el motor de PDF. Revisá tu conexión a internet e intentá de nuevo.');
     return;
@@ -2985,6 +2989,7 @@ function openReaderData(r){
   const coverCardEl = document.querySelector('.doc-cover');
   const indexCardWrapEl = document.getElementById('indexCard');
   const bylineEl = document.getElementById('readerByline');
+  window.CURRENT_DIRECT_PDF_URL = r.directPdfUrl || null;
   if(r.hideAutoCover){
     if(coverCardEl) coverCardEl.style.display = 'none';
     if(indexCardWrapEl) indexCardWrapEl.style.display = 'none';
@@ -3047,7 +3052,8 @@ function openRecurso(id){
     title: r.titulo,
     sub: r.descripcion,
     sections: contenido.secciones,
-    hideAutoCover: contenido.hideAutoCover
+    hideAutoCover: contenido.hideAutoCover,
+    directPdfUrl: contenido.directPdfUrl
   });
 }
 function closeReader(){
